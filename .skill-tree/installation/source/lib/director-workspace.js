@@ -47,7 +47,7 @@ function previousLauncherText(location, home) {
   ].join("\n");
 }
 
-function launcherText(location) {
+function launcherText(location, {previous = false} = {}) {
   return [
     "---", "name: skill-tree-director",
     "description: Route project requests through the registered Skill Tree Director workspace.",
@@ -56,6 +56,7 @@ function launcherText(location) {
     `python3 -B "${location}" project-menu ${directorFolder}`, "```", "",
     "Run `project-route` with the requested operation or installed skill ID before inspecting project files or queues. Even a simple README lookup requires `project-read` and the checkout chosen by Director. Use `discovery` for capabilities. An unnamed request uses the co-located project when one is registered.",
     "Use the returned entry, command, input and project scope. Grouped task dispatch requires one exact task per authorized assignment. Use direct Core only on an explicit owner request.",
+    ...(previous ? [] : routing.workflowGuidance),
     "To connect a project, use `project-preview` with `kind` (existing or new), `name`, and optional `path` and `flavor`. Use `project-setup` with the same approved request.",
     ""
   ].join("\n");
@@ -232,6 +233,7 @@ function installDirector(workspace, source, providers, {dryRun = false, verify =
     return item;
   });
   const previousHosts = (previous?.providers || []).map(id => selected.find(host => host.id === id));
+  const previousLaunchers = new Set(previousHosts.map(host => relativePackage(host, launcher)));
   routing.plan(canonical, previousHosts, selected, {verify});
   const names = composer.operationNames(source, "director");
   const selections = selected.flatMap(host => names.map(name => ({name, provider: host.id, rel: relativePackage(host, name)})));
@@ -239,8 +241,12 @@ function installDirector(workspace, source, providers, {dryRun = false, verify =
   const descriptor = {schema: 1, kind: "director-workspace", providers: selected.map(host => host.id), setup_entry: setup};
   const entries = selected.map(host => {
     const entry = relativePackage(host, "skill-tree-director-setup") + "/scripts/director-entry.py";
-    const content = launcherText(path.posix.join(directorFolder, entry));
-    const legacy = moving && previous ? legacyLaunchers(path.posix.join(legacyFolder, entry)) : [];
+    const location = path.posix.join(directorFolder, entry);
+    const content = launcherText(location);
+    const legacy = previousLaunchers.has(relativePackage(host, launcher)) ? [
+      launcherText(location, {previous: true}),
+      ...(moving ? legacyLaunchers(path.posix.join(legacyFolder, entry)) : [])
+    ] : [];
     return {file: checkLauncher(canonical, host, content, legacy), content, legacy, host};
   });
   const message = `Director ${dryRun ? "preview" : "ready"} at ${home}\nOpen ${canonical} in ${selected.map(item => item.label).join(", ")} and invoke skill-tree-director.\nConnect an existing project, create a new project, or continue later.`;
@@ -349,7 +355,8 @@ function removeDirector(workspace, source, providers, {dryRun = false} = {}) {
       const layout = home === ownedPath(canonical, legacyFolder) ? legacyFolder : directorFolder;
       const location = path.posix.join(layout, setupEntry(host));
       const expected = layout === legacyFolder ? previousLauncherText(location, layout) : launcherText(location);
-      return checkLauncher(canonical, host, expected, layout === legacyFolder ? legacyLaunchers(location) : [], true);
+      const legacy = layout === legacyFolder ? legacyLaunchers(location) : [launcherText(location, {previous: true})];
+      return checkLauncher(canonical, host, expected, legacy, true);
     }));
     if (selections.length) manager.uninstall(home, selections, {dryRun, recoverPluginPending:false});
     if (!dryRun) {

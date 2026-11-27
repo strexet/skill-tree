@@ -20,6 +20,9 @@ import uuid
 class RunError(ValueError):
     pass
 
+class LocalRefRejected(RunError):
+    """The protected ref gate rejected the write before touching the target checkout."""
+
 TERMINAL = {'local-result', 'merged'}
 
 def delivery_finished(run):
@@ -54,8 +57,9 @@ def delivery_finished(run):
                 and isinstance(evidence[0].get('path'), str) and sha256(evidence[0].get('sha256')))
     return delivery.get('status') in TERMINAL or (delivery.get('status')=='pr-ready' and not delivery.get('authorization',{}).get('merge'))
 
-def git(root, *args):
-    result = subprocess.run(['git', '-C', str(root), *map(str, args)], capture_output=True, text=True, timeout=45)
+def git(root, *args, git_options=()):
+    result = subprocess.run(['git', '-C', str(root), *map(str, git_options), *map(str, args)],
+                            capture_output=True, text=True, timeout=45)
     if result.returncode:
         # Remote errors can contain credentials. Keep diagnostics deliberately bounded.
         raise RunError('Git operation failed: ' + ' '.join(str(a) for a in args[:2]))
@@ -74,7 +78,13 @@ def runtime(root):
     if not path or not path.exists():
         return None
     data = json.loads(path.read_text())
-    if data.get('schema') != 1 or not isinstance(data.get('worktrees'), dict):
+    pending = data.get('pending_worktrees', {})
+    unverified = data.get('unverified_worktrees', [])
+    if (data.get('schema') != 1 or not isinstance(data.get('worktrees'), dict)
+            or not isinstance(unverified,list) or any(not isinstance(rid,str) or rid not in data['worktrees'] for rid in unverified)
+            or len(set(unverified)) != len(unverified)
+            or not isinstance(pending,dict) or any(not re.fullmatch(r'WR-[a-f0-9-]{36}',rid)
+                or not isinstance(path,str) or not Path(path).is_absolute() for rid,path in pending.items())):
         raise RunError('Unsupported machine-local run locator; explicit recovery required')
     return data
 
@@ -156,6 +166,14 @@ def validate_registry(registry):
         raise RunError('Unsupported run registry; explicit recovery required')
     if any(not isinstance(registry.get(k), dict) for k in ['runs', 'claims', 'resources']):
         raise RunError('Corrupt run registry collections')
+    archived = registry.get('archived_runs', {})
+    if not isinstance(archived, dict) or set(archived) & set(registry['runs']):
+        raise RunError('Historical partial finishes must remain outside the live run registry')
+    for rid, entry in archived.items():
+        if (not isinstance(entry, dict) or entry.get('status') != 'partially-completed'
+                or not isinstance(entry.get('checkpoint'), dict) or entry['checkpoint'].get('id') != rid
+                or not re.fullmatch(r'[a-f0-9]{64}', entry.get('receipt_sha256', ''))):
+            raise RunError('Invalid historical partial finish reference')
     for rid, run in registry['runs'].items():
         validate_hook_references(run)
         if run.get('id') != rid:
@@ -183,6 +201,8 @@ def project(store, state):
         if len(choices) > 1 and not store.allow_unselected:
             raise RunError('Multiple runs exist; select --run-id explicitly')
         rid = choices[0] if len(choices) == 1 else None
+    if rid in registry.get('archived_runs', {}):
+        raise RunError('The selected run is partially closed; inspect the historical result')
     if rid and rid not in registry['runs']:
         raise RunError('Unknown run ID')
     store.selected_run_id = rid
@@ -295,23 +315,174 @@ def workspace_identity(store, rid, payload, existing=False, launch=None):
             raise RunError('Adopted workspace lacks the declared base')
     return {'repo_id': repo_id(store.root), 'remote': remote, 'remote_id': hashlib.sha256(url.encode()).hexdigest(), 'base_branch': base, 'base_commit': commit, 'branch': working, 'worktree_id': rid, 'local_base': bool(payload.get('local_base')), **({'local_base_authorization':payload['local_base_authorization']} if payload.get('local_base') else {})}
 
+def within_directory(path, directory):
+    if path.is_relative_to(directory):
+        return True
+    if not directory.exists():
+        return False
+    identity = directory.stat()
+    return any(parent.exists() and os.path.samestat(parent.stat(),identity) for parent in (path,*path.parents))
+
+
+def default_web_checkout(root, common, queue_id, run_id):
+    location = root.parent/'.skill-tree-worktrees'/queue_id.lower()/run_id.lower()
+    resolved = location.resolve()
+    if resolved != location or within_directory(resolved,root) or within_directory(resolved,common):
+        raise RunError('The default Web worktree requires an unaliased path outside the canonical checkout and Git administrative storage')
+    return resolved
+
+
+def accepts_case_aliases(directory):
+    device = directory.stat().st_dev
+    for ancestor in (directory,*directory.parents):
+        if ancestor.stat().st_dev != device:
+            break
+        if not ancestor.name or ancestor.name.swapcase() == ancestor.name:
+            continue
+        try:
+            return ancestor.samefile(ancestor.with_name(ancestor.name.swapcase()))
+        except FileNotFoundError:
+            return False
+    return False
+
+
+def worktree_paths_overlap(left, right):
+    if within_directory(left,right) or within_directory(right,left):
+        return True
+    # A new directory has no inode to compare. Detect case aliases on the
+    # containing filesystem before accepting distinct unresolved spellings.
+    def normalized(path):
+        return tuple(unicodedata.normalize('NFD',part.casefold()) for part in path.parts)
+    left_key, right_key = normalized(left), normalized(right)
+    if left_key[:len(right_key)] != right_key and right_key[:len(left_key)] != left_key:
+        return False
+    left_parent = next(parent for parent in (left,*left.parents) if parent.is_dir())
+    right_parent = next(parent for parent in (right,*right.parents) if parent.is_dir())
+    return (left_parent.stat().st_dev == right_parent.stat().st_dev
+            and accepts_case_aliases(left_parent) and accepts_case_aliases(right_parent))
+
+
+def guard_web_destination(data, recorded, run_id, path):
+    for rid, location in {**data.get('pending_worktrees',{}),**data['worktrees']}.items():
+        if rid==run_id or rid not in recorded or delivery_finished(recorded[rid]):
+            continue
+        other = Path(location).resolve()
+        if worktree_paths_overlap(path,other):
+            raise RunError('The selected Web path overlaps another retained run worktree: '+str(other))
+
+
+def retain_web_destination(store, run, path):
+    data = runtime(store.root)
+    recorded = json.loads(store.state.read_bytes())['run_registry']['runs']
+    guard_web_destination(data,recorded,run['id'],path)
+    data.setdefault('pending_worktrees',{})[run['id']] = str(path)
+    atomic(runtime_file(store.root),data)
+
+
+def activate_worktree_locator(root, data, run_id, path):
+    pending = data.get('pending_worktrees',{})
+    if run_id in pending and pending[run_id] != str(path):
+        raise RunError('Recovery requires the original exact worktree path')
+    data['worktrees'][run_id] = str(path)
+    pending.pop(run_id,None)
+    if not pending:
+        data.pop('pending_worktrees',None)
+    atomic(runtime_file(root),data)
+
+
 def provision(store, run, payload):
     """Reserve claims first; interrupted provisioning retains the same run ID."""
     policy = run.get('reviewed_local_delivery')
     spec = workspace_identity(store, run['id'], payload, launch=policy['launch'] if policy else None)
     common = common_dir(store.root)
-    path = Path(payload.get('worktree', str(common/'skill-tree-worktrees'/run['id'].lower()))).resolve()
+    if 'worktree' not in payload and run['admission']['flavor']=='web':
+        path = default_web_checkout(store.root,common,runtime(store.root)['queue_id'],run['id'])
+    else:
+        path = Path(payload.get('worktree', str(common/'skill-tree-worktrees'/run['id'].lower()))).resolve()
     if path.exists():
         raise RunError('Worktree destination exists; explicit recovery required')
     if git(store.root,'for-each-ref','--format=%(refname)','refs/heads/'+spec['branch']):raise RunError('Working branch already exists; select the retained run or explicit recovery')
     run['workspace'] = spec
+    run['cleanup_origin_sha256'] = locator_path_sha256(path)
     run['delivery'] = {'implementation': 'in-progress', 'publication': 'not-requested', 'status': 'implementation-in-progress', 'authorization': payload.get('delivery_authorization', {})}
     run['workspace_state'] = 'reserved'
     return path
 
+INITIAL_PROFILE_STOP = 'Initial worktree profile requires verified admission'
+PROFILE_FILE = '.skill-tree/installation/profile.json'
+
+
+def initial_profile_pending(run):
+    return bool(run and run.get('initial_profile', {}).get('status') == 'pending')
+
+
+def reserve_initial_profile(store, run, path, done):
+    """Bind the setup to the verified canonical generation before writing Git."""
+    if run['admission']['identity'] == 'repository-local':
+        return
+    profile = store.root/PROFILE_FILE
+    if not profile.is_file() or profile.is_symlink():
+        raise RunError('Restore the verified canonical profile before reserving a worktree')
+    content = profile.read_bytes()
+    receipt = json.loads(content)
+    if (receipt.get('identity') != run['admission']['identity']
+            or receipt.get('project_root') != str(store.root)):
+        raise RunError('The canonical profile differs from the admitted source generation')
+    manager_relative = '.skill-tree/installation/source/lib/installation.js'
+    manager = store.root/manager_relative
+    installed = manager.read_bytes() if manager.is_file() and not manager.is_symlink() else b''
+    exports = installed.partition(b'module.exports=')[2]
+    if (not re.search(rb'\binitialWorktreeProfile\b',exports)
+            or hashlib.sha256(installed).hexdigest() != receipt.get('bundle_digests',{}).get(manager_relative)):
+        raise RunError('Update the verified canonical installation from current source before reserving an initial worktree profile')
+    run['initial_profile'] = {
+        'status': 'pending', 'source_profile_sha256': hashlib.sha256(content).hexdigest(),
+        'worktree_path_sha256': hashlib.sha256(str(path).encode()).hexdigest(),
+        'claimed_task_ids': sorted(set(run['admitted_task_ids']) - done),
+    }
+    run.update(phase='refresh-profile', stop_reason=INITIAL_PROFILE_STOP,
+               next_action='Prepare the owned worktree profile with prepare-worktree-profile')
+    if run['admission']['flavor']=='web':
+        retain_web_destination(store,run,path)
+
+
+def initial_profile_context(store, state, caller, *, replay=False):
+    run = state.get('active_run') or {}
+    expected_status = 'admitted' if replay else 'pending'
+    if run.get('initial_profile',{}).get('status') != expected_status or run.get('workspace_state') != 'ready':
+        raise RunError('Select the retained initial profile and exact registered worktree')
+    if not replay and (run['phase'] != 'refresh-profile' or run.get('stop_reason') != INITIAL_PROFILE_STOP):
+        raise RunError('Restore the original stopped initial-profile handoff before setup')
+    ensure_workspace(store, run)
+    target = store.source_root
+    if caller not in (store.root, target):
+        raise RunError('Select the canonical checkout or the exact reserved worktree for profile setup')
+    if (hashlib.sha256(str(target).encode()).hexdigest() != run['initial_profile']['worktree_path_sha256']
+            or local_git_text(target, 'rev-parse', '--verify', 'HEAD') != run['workspace']['base_commit']):
+        raise RunError('Initial profile setup requires the original exact worktree and Git base')
+    registration = linked_registration(store.root, target)
+    owner = run['workspace'].get('cleanup_owner')
+    if owner:
+        directed_owner(store.root, target, run, state['run_registry']['queue_id'])
+    elif not run.get('workspace_recoveries'):
+        raise RunError('Initial profile setup requires the owned or explicitly recovered linked checkout')
+    claimed = sorted(tid for tid, rid in state['run_registry']['claims'].items() if rid == run['id'])
+    if claimed != run['initial_profile']['claimed_task_ids']:
+        raise RunError('Initial profile setup requires the original reserved task claims')
+    return {
+        'run_id': run['id'], 'queue_id': state['run_registry']['queue_id'], 'worktree': str(target),
+        'locator_sha256': hashlib.sha256(runtime_file(store.root).read_bytes()).hexdigest(),
+        'state_sha256': hashlib.sha256(store.state.read_bytes()).hexdigest(),
+        'registration': registration.name, 'owner': owner,
+        'source_profile_sha256': run['initial_profile']['source_profile_sha256'],
+    }
+
+
 def create_reserved(store, run, path):
+    if run['admission']['flavor']=='web' and path.resolve()!=path:
+        raise RunError('The original Web worktree path changed before Git creation')
     data = runtime(store.root)
-    data['worktrees'][run['id']] = str(path); atomic(runtime_file(store.root), data)
+    activate_worktree_locator(store.root,data,run['id'],path)
     git(store.root, 'worktree', 'add', '-b', run['workspace']['branch'], path, run['workspace']['base_commit'])
     run['workspace']['cleanup_owner'] = directed_owner(store.root, path, run, data['queue_id'], created=True)
     run['workspace_state'] = 'ready'
@@ -342,25 +513,78 @@ def cleanup_quarantine(root, attempt):
     return directory/'checkout'
 
 
-def cleanup_checkout(root, registry, run, original):
+def locator_path_sha256(path):
+    return hashlib.sha256(os.fsencode(path)).hexdigest()
+
+
+def cleanup_worktree_owner(root, registry, run):
     locator = runtime(root)
     workspace = run['workspace']
     owner = workspace.get('cleanup_owner')
-    if not isinstance(owner, dict) or owner.get('run_id') != run['id'] or owner.get('queue_id') != registry['queue_id']:
+    if (not isinstance(owner,dict) or owner.get('run_id') != run['id']
+            or owner.get('queue_id') != registry['queue_id']
+            or not isinstance(owner.get('token'),str) or not owner['token']):
         raise RunError('The worktree has no current controller creation proof')
-    if run.get('workspace_recoveries') or run.get('workspace_state') != 'ready':
-        raise RunError('A recovered or unfinished worktree requires separate ownership inspection')
+    if run.get('workspace_state') != 'ready':
+        raise RunError('An unfinished worktree requires separate ownership inspection')
     if not locator or locator['queue_id'] != registry['queue_id'] or run['id'] not in locator['worktrees']:
         raise RunError('The exact controller worktree locator is unavailable')
     name = owner.get('registration')
-    if not isinstance(name, str) or name in {'', '.', '..'} or Path(name).name != name:
+    if not isinstance(name,str) or name in {'','.','..'} or Path(name).name != name:
         raise RunError('The Git administrative identity is invalid')
     origin = Path(locator['worktrees'][run['id']])
     if not origin.is_absolute() or root.is_relative_to(origin):
         raise RunError('The worktree locator is ambiguous or contains the canonical checkout')
-    registration = common_dir(root)/'worktrees'/name
-    if original and original['locator_sha256'] != hashlib.sha256(os.fsencode(origin)).hexdigest():
-        raise RunError('The original worktree locator changed after removal preparation')
+    return locator, owner, origin, common_dir(root)/'worktrees'/name
+
+
+def cleanup_origin_sha256(run):
+    candidates = [run.get('cleanup_origin_sha256'), run.get('dispatch_workspace_sha256'),
+                  (run.get('initial_profile') or {}).get('worktree_path_sha256')]
+    known = [value for value in candidates if value is not None]
+    if (any(not isinstance(value,str) or not re.fullmatch(r'[a-f0-9]{64}',value) for value in known)
+            or len(set(known)) > 1):
+        raise RunError('Conflicting original worktree location proofs')
+    return known[0] if known else None
+
+
+def verified_move_chain(run, owner):
+    anchor = cleanup_origin_sha256(run)
+    prior = None
+    for receipt in run.get('workspace_recoveries',[]):
+        if (not isinstance(receipt,dict) or receipt.get('kind') != 'verified-worktree-move'
+                or receipt.get('owner') != owner
+                or receipt.get('branch') != run['workspace']['branch']
+                or any(not isinstance(receipt.get(key),str) or not re.fullmatch(r'[a-f0-9]{64}',receipt[key])
+                       for key in ('from_locator_sha256','to_locator_sha256'))
+                or receipt['from_locator_sha256'] == receipt['to_locator_sha256']
+                or receipt['from_locator_sha256'] != (prior['to_locator_sha256'] if prior else anchor)):
+            raise RunError('A recovered worktree requires separate ownership inspection')
+        prior = receipt
+    return prior
+
+
+def path_absent(path):
+    try:
+        path.lstat()
+    except FileNotFoundError:
+        return True
+    return False
+
+
+def latest_verified_move(run):
+    history = run.get('workspace_recoveries',[])
+    last = history[-1] if history else None
+    return last if isinstance(last,dict) and last.get('kind') == 'verified-worktree-move' else None
+
+
+def pending_verified_move(run, locator):
+    last = latest_verified_move(run)
+    return bool(last and locator and last.get('from_locator_sha256') == locator_path_sha256(locator)
+                and last.get('to_locator_sha256') != last.get('from_locator_sha256'))
+
+
+def registered_worktrees(root):
     records = local_git(root, 'worktree', 'list', '--porcelain', '-z').stdout.split(b'\0\0')
     registrations = {}
     for record in records:
@@ -370,17 +594,34 @@ def cleanup_checkout(root, registry, run, original):
             if registered in registrations:
                 raise RunError('Git reports an ambiguous worktree registration')
             registrations[registered] = fields
+    return registrations
+
+
+def cleanup_checkout(root, registry, run, original):
+    locator, owner, origin, registration = cleanup_worktree_owner(root,registry,run)
+    move = verified_move_chain(run,owner)
+    current_path_sha = locator_path_sha256(origin)
+    anchor = move['to_locator_sha256'] if move else cleanup_origin_sha256(run)
+    if anchor is not None and anchor != current_path_sha:
+        raise RunError('Activate the exact verified worktree relocation before cleanup')
+    if anchor is None and run['id'] in locator.get('unverified_worktrees',[]):
+        raise RunError('The recovered legacy locator lacks original worktree location evidence')
+    if original and original['locator_sha256'] != current_path_sha:
+        raise RunError('The original worktree locator changed after removal preparation')
+    registrations = registered_worktrees(root)
     quarantine = cleanup_quarantine(root, original) if original else None
     if quarantine and quarantine.is_symlink():
         raise RunError('The staged worktree path is ambiguous')
-    registration_absent = not registration.exists() and not registration.is_symlink()
-    if original and original.get('staged') and registration_absent and not quarantine.exists() and quarantine not in registrations:
+    registration_absent = path_absent(registration)
+    if original and original.get('external_removal') and registration_absent and origin not in registrations:
+        return None
+    if original and original.get('staged') and registration_absent and path_absent(quarantine) and quarantine not in registrations:
         # A newly created directory at the original path does not belong to the removed registration.
         return None
     if origin.resolve() != origin:
         raise RunError('The original worktree location changed')
     path = quarantine if quarantine and (quarantine.exists() or quarantine in registrations) else origin
-    if not path.exists() and registration_absent and path not in registrations:
+    if path_absent(path) and registration_absent and path not in registrations:
         if original:
             return None
         raise RunError('The selected worktree disappeared before a cleanup attempt was prepared')
@@ -399,6 +640,22 @@ def cleanup_checkout(root, registry, run, original):
     if Path.cwd().resolve().is_relative_to(path):
         raise RunError('Retry cleanup from outside the selected worktree')
     return path
+
+
+def verify_external_worktree_removal(root, registry, run, requested, attempt):
+    _, owner, origin, registration = cleanup_worktree_owner(root,registry,run)
+    move = verified_move_chain(run,owner)
+    anchor = move['to_locator_sha256'] if move else cleanup_origin_sha256(run)
+    if anchor != locator_path_sha256(origin):
+        raise RunError('External acknowledgement requires verified original worktree location evidence')
+    if requested != str(origin) or origin.resolve() != origin:
+        raise RunError('External removal acknowledgement requires the original exact worktree location')
+    worktrees = registered_worktrees(root)
+    staged = cleanup_quarantine(root,attempt) if attempt else None
+    if (not path_absent(origin) or not path_absent(registration) or origin in worktrees
+            or staged and (not path_absent(staged) or staged in worktrees)):
+        raise RunError('The old worktree, staged checkout or Git registration is still present')
+    return locator_path_sha256(origin)
 
 
 def cleanup_source_guard(path, source_ref, source_head):
@@ -564,32 +821,80 @@ def recover_locator(store, payload, *, bootstrap_state_sha256=None):
         required={rid for rid,run in registry['runs'].items() if not delivery_finished(run)}
         if not isinstance(mapping,dict) or not required.issubset(mapping) or set(mapping)-set(registry['runs']):
             raise RunError('Recovery requires every unfinished retained run locator and rejects unknown run IDs')
+        restored, pending = {}, {}
+        unverified = []
+        try:
+            previous = runtime(store.root) or {}
+        except (OSError,ValueError):
+            previous = {}
+        previous_paths = previous.get('worktrees',{})
+        for rid, run in registry['runs'].items():
+            bound = previous_paths.get(rid)
+            if pending_verified_move(run,bound):
+                restored[rid] = bound
         for rid, value in mapping.items():
             path = Path(value).resolve(); run = registry['runs'][rid]
+            bound = previous_paths.get(rid)
+            move = latest_verified_move(run)
+            if pending_verified_move(run,bound) or move and not bound:
+                if locator_path_sha256(path) != move['from_locator_sha256']:
+                    raise RunError('Restore the previous locator before activating the exact recorded relocation')
+                restored[rid] = str(path)
+                continue
+            anchor = cleanup_origin_sha256(run)
+            if run.get('workspace_state') == 'reserved' and anchor is not None:
+                if locator_path_sha256(path) != anchor:
+                    raise RunError('Locator recovery requires the original exact reserved worktree path')
+                if not path.exists():
+                    pending[rid] = str(path)
+                    continue
             if common_dir(path) != common_dir(store.root) or git(path, 'symbolic-ref', '--short', 'HEAD') != run['workspace']['branch']:
                 raise RunError('Recovery workspace identity mismatch')
-        atomic(runtime_file(store.root), {'schema': 1, 'queue_id': registry['queue_id'], 'canonical_root': str(store.root), 'worktrees': mapping})
+            restored[rid] = str(path)
+            if cleanup_origin_sha256(run) is None and (
+                    previous.get('worktrees',{}).get(rid) != str(path)
+                    or rid in previous.get('unverified_worktrees',[])):
+                unverified.append(rid)
+        data = {'schema':1,'queue_id':registry['queue_id'],'canonical_root':str(store.root),'worktrees':restored}
+        if previous.get('archived_worktrees'):
+            data['archived_worktrees'] = {rid: entry for rid, entry in previous['archived_worktrees'].items()
+                                         if rid in registry.get('archived_runs', {})}
+        if unverified:
+            data['unverified_worktrees'] = sorted(unverified)
+        if pending:
+            data['pending_worktrees']=pending
+        atomic(runtime_file(store.root),data)
         return {'recovered': registry['queue_id']}
+
+def change_resource(registry,run,payload,*,wave=None):
+    if not registry or not run:
+        raise RunError('A selected registered run is required')
+    key=payload.get('resource')
+    if not isinstance(key,str) or not re.fullmatch(r'[a-z0-9][a-z0-9:/._-]*',key):
+        raise RunError('Explicit stable resource identity required')
+    previous=registry['resources'].get(key)
+    if payload.get('release'):
+        if (not previous or previous['run_id']!=run['id'] or previous['token']!=payload.get('token')
+                or previous.get('wave')!=wave):
+            raise RunError('Resource release requires the owning run, token and exact wave scope')
+        del registry['resources'][key]
+        return {'released':key}
+    if previous:
+        raise RunError('Resource already claimed; inspect owner and cleanup before explicit release')
+    result={'run_id':run['id'],'token':str(uuid.uuid4()),'pid':os.getpid(),'host':socket.gethostname(),
+            'purpose':payload.get('purpose',key)}
+    if wave is not None:result['wave']=wave
+    registry['resources'][key]=result
+    return result
+
 
 def resource(store, payload):
     with store.lock():
-        text = store.text(); state = store.load(text); run = state['active_run']; registry = state.get('run_registry')
-        if not registry or not run:
-            raise RunError('A selected registered run is required')
-        key = payload.get('resource')
-        if not isinstance(key, str) or not re.fullmatch(r'[a-z0-9][a-z0-9:/._-]*', key):
-            raise RunError('Explicit stable resource identity required')
-        previous = registry['resources'].get(key)
-        if payload.get('release'):
-            if not previous or previous['run_id'] != run['id'] or previous['token'] != payload.get('token'):
-                raise RunError('Resource release requires the owning run and token')
-            del registry['resources'][key]; result = {'released': key}
-        else:
-            if previous:
-                raise RunError('Resource already claimed; inspect owner and cleanup before explicit release')
-            result = {'run_id': run['id'], 'token': str(uuid.uuid4()), 'pid': os.getpid(), 'host': socket.gethostname(), 'purpose': payload.get('purpose', key)}
-            registry['resources'][key] = result
-        store.save(text, state); return result
+        text=store.text()
+        state=store.load(text)
+        result=change_resource(state.get('run_registry'),state['active_run'],payload)
+        store.save(text,state)
+        return result
 
 @contextmanager
 def publication_lock(root, remote, target):
@@ -649,16 +954,21 @@ def local_git_environment():
     return env
 
 
-def local_git_args(root, *args):
-    return ['git', '--no-replace-objects', '--no-optional-locks', '--literal-pathspecs', '-C', str(root),
+def local_git_args(root, *args, literal_pathspecs=True):
+    pathspec_mode = ['--literal-pathspecs'] if literal_pathspecs else []
+    return ['git', '--no-replace-objects', '--no-optional-locks', *pathspec_mode, '-C', str(root),
             '-c', 'core.fsmonitor=false', '-c', 'diff.autoRefreshIndex=false', *map(str, args)]
 
 
-def local_git(root, *args, accepted=(0,), index=None):
+def local_git(root, *args, accepted=(0,), index=None, literal_pathspecs=True, git_options=()):
     environment = local_git_environment()
     if index is not None:
         environment['GIT_INDEX_FILE'] = str(index)
-    result = subprocess.run(local_git_args(root, *args), env=environment, capture_output=True, timeout=45)
+    if not literal_pathspecs:
+        for name in ('LITERAL', 'GLOB', 'NOGLOB', 'ICASE'):
+            environment.pop('GIT_' + name + '_PATHSPECS', None)
+    result = subprocess.run(local_git_args(root, *git_options, *args, literal_pathspecs=literal_pathspecs),
+                            env=environment, capture_output=True, timeout=45)
     if result.returncode not in accepted:
         raise RunError('Local Git operation failed: ' + str(args[0]))
     return result
@@ -668,8 +978,8 @@ def local_git_text(root, *args):
     return local_git(root, *args).stdout.decode('utf-8').strip()
 
 
-def local_git_paths(root, *args):
-    raw = local_git(root, *args).stdout
+def local_git_paths(root, *args, literal_pathspecs=True):
+    raw = local_git(root, *args, literal_pathspecs=literal_pathspecs).stdout
     try:
         return set(raw.decode('utf-8').split('\0')[:-1])
     except UnicodeError as exc:
@@ -678,6 +988,160 @@ def local_git_paths(root, *args):
 
 def local_overlap(left, right):
     return left == right or left.startswith(right + '/') or right.startswith(left + '/')
+
+
+def ignored_unversioned_directories(root):
+    versioned = None
+
+    def whole_directory(path):
+        nonlocal versioned
+        relative = path.relative_to(root).as_posix()
+        checkout = local_git(path, 'rev-parse', '--show-toplevel', accepted=(0, 128))
+        if checkout.returncode or Path(os.fsdecode(checkout.stdout).rstrip('\n')).resolve() != root:
+            return False
+        ignored = local_git_paths(root, 'ls-files', '--others', '--ignored', '--exclude-standard',
+                                  '--directory', '-z', '--', relative)
+        if relative + '/' not in ignored:
+            return False
+        if versioned is None:
+            indexed = local_git_paths(root, 'ls-files', '-z')
+            head = local_git(root, 'rev-parse', '--verify', '--quiet', 'HEAD', accepted=(0, 1))
+            committed = local_git_paths(root, 'ls-tree', '-r', '--name-only', '-z', 'HEAD') if not head.returncode else set()
+            versioned = {unicodedata.normalize('NFC', item).casefold() for item in indexed | committed}
+        key = unicodedata.normalize('NFC', relative).casefold()
+        return not any(local_overlap(key, item) for item in versioned)
+
+    return whole_directory
+
+
+def worker_path(value):
+    if (not isinstance(value, str) or not value or '\\' in value
+            or any(ord(char) < 32 for char in value)
+            or any(part.casefold() in {'', '.', '..', '.git'} for part in value.split('/'))):
+        raise RunError('Worker paths must be exact repository-relative paths')
+    return value
+
+
+def worker_paths(values):
+    if not isinstance(values, list):
+        raise RunError('Worker scope requires a list of paths')
+    paths = [worker_path(value) for value in values]
+    if len(set(paths)) != len(paths):
+        raise RunError('Worker paths must be distinct')
+    return sorted(paths)
+
+
+def worker_checkout(coordinator, supplied):
+    if not isinstance(supplied, str) or not supplied:
+        raise RunError('Worker scope requires an exact linked checkout')
+    path = Path(supplied)
+    if not path.is_absolute() or path.resolve() != path or path == coordinator:
+        raise RunError('Worker scope requires a distinct exact linked checkout')
+    root = Path(local_git_text(path, 'rev-parse', '--show-toplevel'))
+    common = common_dir(coordinator)
+    git_dir = Path(local_git_text(path, 'rev-parse', '--absolute-git-dir')).resolve()
+    if root != path or common is None or git_dir.parent != common / 'worktrees' or common_dir(path) != common:
+        raise RunError('Worker checkout must be an isolated worktree of the coordinator repository')
+    if str(path) in (runtime(coordinator) or {}).get('worktrees', {}).values():
+        raise RunError('A registered controller checkout cannot serve as a worker checkout')
+    unfinished(path)
+    identity = git_dir.stat()
+    checkout = hashlib.sha256(
+        f'{git_dir.relative_to(common).as_posix()}:{identity.st_dev}:{identity.st_ino}'.encode()
+    ).hexdigest()
+    return path, checkout
+
+
+def worker_head(root):
+    return local_git_text(root, 'rev-parse', '--verify', 'HEAD^{commit}')
+
+
+def require_clean_worker(root, artifacts=()):
+    entries = local_git(root, 'ls-files', '-v', '-z', '--').stdout.split(b'\0')
+    if any(entry and (entry[:1].islower() or entry.startswith(b'S ')) for entry in entries):
+        raise RunError('Worker checkout must have a fully visible Git index')
+    if local_git_paths(root, 'diff', 'HEAD', '--name-only', '--no-renames', '-z', '--'):
+        raise RunError('Worker checkout has uncommitted tracked changes')
+    if local_git_paths(root, 'ls-files', '--others', '--exclude-standard', '-z') - set(artifacts):
+        raise RunError('Worker checkout has unsubmitted untracked paths')
+
+
+def worker_candidate(root, base, head, allowed, artifacts):
+    if not isinstance(head, str) or head != worker_head(root):
+        raise RunError('Worker candidate must match the exact checked-out commit')
+    require_clean_worker(root, artifacts)
+    if head == base or local_git(root, 'merge-base', '--is-ancestor', base, head, accepted=(0, 1)).returncode:
+        raise RunError('Worker candidate must extend the recorded source base')
+    paths = sorted(local_git_paths(root, 'diff', '--name-only', '--no-renames', '-z', base, head, '--'))
+    if not paths or any(not any(path == scope or path.startswith(scope + '/') for scope in allowed)
+                        for path in worker_paths(paths)):
+        raise RunError('Worker candidate changed paths outside the assigned scope or has no changes')
+    tree = local_git_text(root, 'rev-parse', '--verify', head + '^{tree}')
+    return {'head': head, 'tree': tree, 'paths': paths}
+
+
+def wave_blobs(root, head, paths):
+    if not paths:
+        return {}
+    entries={}
+    raw=local_git(root,'ls-tree','-rz',head,'--',*paths).stdout
+    for line in raw.split(b'\0')[:-1]:
+        metadata,path=line.split(b'\t',1)
+        mode,kind,object_id=metadata.decode().split()
+        path=path.decode()
+        if kind!='blob' or mode not in {'100644','100755'} or path not in paths:
+            raise RunError('Wave incorporation supports exact regular files only')
+        entries[path]=(mode,object_id)
+    return entries
+
+
+def wave_worktree_blobs(root, paths):
+    result={}
+    for relative in paths:
+        path=root / relative
+        if path.is_symlink() or any((root / parent).is_symlink() for parent in Path(relative).parents):
+            raise RunError('Wave path cannot use a symlink')
+        if not path.exists():
+            continue
+        if not path.is_file():
+            raise RunError('Wave incorporation requires regular files')
+        mode='100755' if path.stat().st_mode & stat.S_IXUSR else '100644'
+        result[relative]=(mode,local_git_text(root,'hash-object','--no-filters','--',relative))
+    return result
+
+
+def preflight_wave_candidate(root,baseline,base,candidate,*,recover=False):
+    local_git_policy(root,merge=False,signed=True)
+    require_task_checkout(root,baseline)
+    coordinator=baseline['head']
+    paths=worker_paths(candidate['paths'])
+    before=wave_blobs(root,base,paths)
+    after=wave_blobs(root,candidate['head'],paths)
+    if wave_blobs(root,coordinator,paths)!=before:
+        raise RunError('Coordinator changed a worker-owned or overlapping path before incorporation')
+    if local_git_paths(root,'diff','--cached','--name-only','--no-renames','-z',coordinator,'--',*paths):
+        raise RunError('Wave incorporation cannot replace staged edits')
+    current=wave_worktree_blobs(root,paths)
+    if current!=before and not (recover and current==after):
+        raise RunError('Wave incorporation cannot replace unrelated local edits')
+    return paths,before,after,current==after
+
+
+def apply_wave_candidate(root, baseline, base, candidate):
+    paths,before,after,applied=preflight_wave_candidate(root,baseline,base,candidate,recover=True)
+    if applied:
+        return
+    with tempfile.TemporaryDirectory(prefix='skill-tree-wave-') as temporary:
+        patch=Path(temporary)/'worker.patch'
+        patch.write_bytes(local_git(root,'diff','--binary','--no-renames','--no-ext-diff','--no-textconv',base,candidate['head'],'--',*paths).stdout)
+        local_git(root,'apply','--check','--whitespace=nowarn',str(patch))
+        require_task_checkout(root,baseline)
+        if wave_worktree_blobs(root,paths)!=before:
+            raise RunError('Checked wave inputs changed before writing')
+        local_git(root,'apply','--whitespace=nowarn',str(patch))
+    require_task_checkout(root,baseline)
+    if wave_worktree_blobs(root,paths)!=after:
+        raise RunError('Recover the exact wave incorporation before continuing')
 
 
 def checked_out_branch(root):
@@ -693,6 +1157,28 @@ def checked_out_branch(root):
     gitdir = Path(local_git_text(root, 'rev-parse', '--absolute-git-dir'))
     checkout = hashlib.sha256(gitdir.resolve().relative_to(common_dir(root)).as_posix().encode()).hexdigest()
     return {'ref': ref, 'head': head, 'checkout': checkout}
+
+
+def verified_pr_source_worktree(canonical_root, selected, source_branch, head):
+    local_git_environment()
+    if not isinstance(selected,str):
+        raise RunError('PR resume requires an exact source checkout path')
+    path = Path(selected)
+    common = common_dir(canonical_root)
+    if (not common or not path.is_absolute() or path.resolve() != path or not path.is_dir()
+            or common_dir(path) != common):
+        raise RunError('Select an exact source worktree in the original Git repository')
+    if path != canonical_root:
+        linked_registration(canonical_root,path)
+    identity = checked_out_branch(path)
+    if identity['ref'] != 'refs/heads/'+source_branch or identity['head'] != head:
+        raise RunError('Selected PR source worktree differs from the original branch or head')
+    entries = local_git(path,'ls-files','-v','-z','--').stdout.split(b'\0')
+    if any(entry[:1] == b'S' or entry[:1].islower() for entry in entries):
+        raise RunError('The selected PR source index must expose every tracked file')
+    if local_git(path,'status','--porcelain','-z').stdout:
+        raise RunError('The selected PR source worktree has uncommitted changes')
+    return path,identity
 
 
 def task_commit_baseline(root):
@@ -753,7 +1239,7 @@ def validation_input_paths(root, source, directory_entry):
     return paths
 
 
-def require_committed_check_inputs(root, owned, sources):
+def require_committed_check_inputs(root, owned, sources, *, ignored_directories=()):
     if not sources:
         return
     root = root.resolve()
@@ -798,7 +1284,15 @@ def require_committed_check_inputs(root, owned, sources):
         raise RunError('Task validation inputs must be visible in the checked-out Git index')
     dirty = set(task_commit_baseline(root)['dirty'])
     pathspecs = sorted({git_spelling(path) for path in aliases})
-    dirty.update(local_git_paths(root, 'ls-files', '--others', '--ignored', '--exclude-standard', '-z', '--', *pathspecs))
+    exclusions = []
+    for path in sorted(ignored_directories):
+        key = match_key(path)
+        if not any(source == key or source.startswith(key + '/') for source in scope):
+            exclusions.append(':(exclude,literal)' + git_spelling(path))
+    if exclusions:
+        pathspecs = [':(literal)' + path for path in pathspecs] + exclusions
+    dirty.update(local_git_paths(root, 'ls-files', '--others', '--ignored', '--exclude-standard',
+                                 '-z', '--', *pathspecs, literal_pathspecs=not exclusions))
     for path in sorted(dirty):
         if path not in owned and overlaps(path):
             raise RunError('The scoped candidate excludes a changed validation input: '+repr(path))
@@ -1037,6 +1531,72 @@ def local_merge_receipt(root, preparation, current_head):
     return {'commit': current_head, 'parents': parents, 'tree': tree}
 
 
+def current_target_merge_tree(root, target_head, source_head):
+    result = local_git(root, 'merge-tree', '--write-tree', '--name-only', '--no-messages', '-z',
+                       target_head, source_head, accepted=(0, 1))
+    tree, *paths = result.stdout.decode('utf-8').split('\0')
+    if not re.fullmatch(r'[a-f0-9]{40}|[a-f0-9]{64}', tree):
+        raise RunError('Git could not prepare an unambiguous current-target merge tree')
+    paths = sorted({worker_path(path) for path in paths if path})
+    if bool(paths) != bool(result.returncode):
+        raise RunError('Git did not identify the exact conflicting paths')
+    return tree, paths
+
+
+def current_target_area(root, attempt):
+    return common_dir(root)/('skill-tree-integration-'+attempt['id'].lower())/'checkout'
+
+
+def current_target_checkout(root, attempt, *, create=False):
+    area = current_target_area(root, attempt)
+    if area.is_symlink() or area.parent.is_symlink():
+        raise RunError('The current-target worktree path is ambiguous')
+    if create and not area.exists():
+        area.parent.mkdir(mode=0o700, exist_ok=True)
+        if area.parent.stat().st_mode & 0o077:
+            raise RunError('The integration checkout directory is accessible to other users')
+        local_git_policy(root, merge=False, signed=True)
+        with tempfile.TemporaryDirectory(dir=area.parent, prefix='hooks-') as hooks:
+            local_git(root, '-c', f'core.hooksPath={hooks}', 'worktree', 'add', '-b',
+                      attempt['candidate_ref'].removeprefix('refs/heads/'), area, attempt['draft_head'])
+    linked_registration(root, area)
+    actual = checked_out_branch(area)
+    if actual['ref'] != attempt['candidate_ref'] or (attempt.get('checkout') and actual['checkout'] != attempt['checkout']):
+        raise RunError('The exact current-target integration checkout changed')
+    return area, actual
+
+
+def current_target_commit(root, attempt, tree):
+    signing = local_git_policy(root, merge=False, signed=True)
+    return local_git_text(root, 'commit-tree', tree, signing, '-p', attempt['target_head'],
+                          '-p', attempt['source']['source_head'], '-m', 'Skill Tree integration '+attempt['id'])
+
+
+def current_target_dirt(area):
+    dirty = local_worktree_dirt(area, allow_staged=True)
+    staged = local_git_paths(area,'diff','--cached','--name-only','--no-renames','-z','--')
+    return staged | {path for path in dirty if not local_unchanged_file(area,path)}
+
+
+def apply_current_target_candidate(area, attempt, candidate):
+    index = task_index_path(area)
+    with local_git_lock(index.with_name(index.name+'.lock')):
+        actual = checked_out_branch(area)
+        if (actual['checkout'] != attempt['checkout'] or actual['ref'] != attempt['candidate_ref']
+                or actual['head'] not in {candidate['commit'], attempt['draft_head']}
+                or local_git(area,'diff','--cached','--quiet',candidate['commit'],'--',accepted=(0,1)).returncode
+                or any(not local_unchanged_file(area,path) for path in
+                       local_git_paths(area,'diff','--name-only','--no-renames','-z','--'))
+                or local_git_paths(area, 'ls-files', '--others', '--exclude-standard', '-z')):
+            raise RunError('The current-target candidate changed before sealing')
+        if actual['head'] != candidate['commit']:
+            with tempfile.TemporaryDirectory(dir=index.parent, prefix='integration-seal-') as hooks:
+                with prepare_ref_update(area, actual['head'], candidate['commit'], hooks) as process:
+                    output, _ = process.communicate('commit\n', timeout=45)
+                    if process.returncode or output != 'commit: ok\n':
+                        raise RunError('Recover the exact prepared integration candidate before retry')
+
+
 def reconcile_reviewed_merge_index(root, attempt, merge):
     paths=attempt['incoming']
     if not paths:
@@ -1082,7 +1642,7 @@ def local_git_bool(root, key):
     return result.returncode==0 and result.stdout.strip()==b'true'
 
 
-def local_git_policy(root, *, merge=True, signed=False):
+def local_git_policy(root, *, merge=True, signed=False, fast_forward=False):
     sign_commit=local_git_bool(root,'commit.gpgSign')
     if sign_commit and not signed:
         raise RunError('Local Git delivery requires handling of the enabled signing policy: commit.gpgSign')
@@ -1093,6 +1653,15 @@ def local_git_policy(root, *, merge=True, signed=False):
         options = local_git(root, 'config', '--get-all', 'branch.' + target + '.mergeOptions', accepted=(0, 1))
         if options.stdout.strip():
             raise RunError('Local merge is blocked by branch-specific Git merge options')
+    names = ('reference-transaction', 'post-index-change')
+    if not fast_forward:
+        names = ('prepare-commit-msg', 'commit-msg', 'post-commit') + names
+        names += ('pre-merge-commit', 'post-merge') if merge else ('pre-commit',)
+    require_local_git_hooks(root, names)
+    return '-S' if sign_commit else '--no-gpg-sign'
+
+
+def require_local_git_hooks(root, names):
     configured = local_git(root, 'config', '--path', '--get', 'core.hooksPath', accepted=(0, 1))
     if configured.returncode == 0:
         value = configured.stdout.decode('utf-8').rstrip('\n')
@@ -1101,13 +1670,10 @@ def local_git_policy(root, *, merge=True, signed=False):
         hooks = root / value
     else:
         hooks = Path(local_git_text(root, 'rev-parse', '--path-format=absolute', '--git-path', 'hooks'))
-    names = ('prepare-commit-msg', 'commit-msg', 'post-commit', 'reference-transaction', 'post-index-change')
-    names += ('pre-merge-commit', 'post-merge') if merge else ('pre-commit',)
     for name in names:
         location = hooks / name
         if location.is_file() and os.access(location, os.X_OK):
             raise RunError('Local Git delivery is blocked by an executable Git hook: ' + name)
-    return '-S' if sign_commit else '--no-gpg-sign'
 
 
 @contextmanager
@@ -1124,7 +1690,7 @@ def local_git_lock(path):
 
 
 @contextmanager
-def local_ref_transaction(root, hooks, source_ref, source_head, target_ref, target_head, merge):
+def local_ref_transaction(root, hooks, source_ref, source_head, target_ref, target_head, merge, verify_refs=()):
     args = local_git_args(root, '-c', f'core.hooksPath={hooks}', 'update-ref', '-m',
                           'Skill Tree local merge', '--stdin')
     with subprocess.Popen(args, env=local_git_environment(), stdin=subprocess.PIPE, stdout=subprocess.PIPE,
@@ -1133,13 +1699,14 @@ def local_ref_transaction(root, hooks, source_ref, source_head, target_ref, targ
         timer.daemon = True
         timer.start()
         try:
+            extra = ''.join(f'option no-deref\nverify {ref} {head}\n' for ref, head in verify_refs)
             commands = ('start\noption no-deref\n'
-                        f'verify {source_ref} {source_head}\noption no-deref\n'
+                        f'verify {source_ref} {source_head}\n{extra}option no-deref\n'
                         f'update {target_ref} {merge} {target_head}\nprepare\n')
             process.stdin.write(commands)
             process.stdin.flush()
             if process.stdout.readline() != 'start: ok\n' or process.stdout.readline() != 'prepare: ok\n':
-                raise RunError('The exact local source or target ref could not be locked for integration')
+                raise LocalRefRejected('The exact local source or target ref could not be locked for integration')
         finally:
             timer.cancel()
         try:
@@ -1160,6 +1727,8 @@ def run_local_merge(root, source_root, preparation, *, fast_forward=False):
     target_ref, target_head = preparation['target_ref'], preparation['target_head']
     reviewed=preparation.get('allow_unrelated_staged',False)
     policy_options={'signed':True} if reviewed else {}
+    if fast_forward:
+        policy_options['fast_forward']=True
     local_git_policy(root,**policy_options)
     if any(Path(local_git_text(path, 'rev-parse', '--show-toplevel')).resolve() != path
            for path in (root, source_root)):
@@ -1174,7 +1743,7 @@ def run_local_merge(root, source_root, preparation, *, fast_forward=False):
     with local_git_lock(index_path.with_suffix('.lock')), local_git_lock(head_path.with_suffix('.lock')):
         if (local_git_text(root, 'symbolic-ref', '--no-recurse', 'HEAD') != target_ref
                 or local_git_text(root, 'rev-parse', '--verify', target_ref) != target_head):
-            raise RunError('The exact prepared target branch or head changed before integration')
+            raise LocalRefRejected('The exact prepared target branch or head changed before integration')
         unfinished(root)
         signing=local_git_policy(root,**policy_options)
         if reviewed and local_git_bool(root,'merge.verifySignatures'):
@@ -1201,9 +1770,10 @@ def run_local_merge(root, source_root, preparation, *, fast_forward=False):
                 '-p', source_head, '-m', f'Merge {source_ref} into {target_ref}')
             # Run the ref transaction from the distinct source worktree so Git
             # does not try to acquire the canonical worktree's protected HEAD lock.
-            with local_ref_transaction(source_root, hooks, source_ref, source_head, target_ref, target_head, merge) as process:
+            verify_refs = preparation.get('verify_refs', ())
+            with local_ref_transaction(source_root, hooks, source_ref, source_head, target_ref, target_head, merge, verify_refs) as process:
                 if any(local_git(root, 'symbolic-ref', '--quiet', '--no-recurse', ref, accepted=(0, 1)).returncode == 0
-                       for ref in (source_ref, target_ref)):
+                       for ref in (source_ref, target_ref, *(ref for ref, _ in verify_refs))):
                     raise RunError('Protected local merge requires direct prepared Git branch refs')
                 checkout = ('--work-tree', root, '-c', f'core.hooksPath={hooks}', 'read-tree', '-u', '-m')
                 local_git(root, *checkout, '-n', target_head, merge, index=index)
@@ -1227,9 +1797,10 @@ def run_local_merge(root, source_root, preparation, *, fast_forward=False):
 
 def environment(store, payload=None):
     """Inspect prerequisites without reading secret contents or launching processes."""
-    payload = payload or {}; root = store.source_root
+    payload = payload or {}
     state = store.load(); run = state['active_run']; registry = state.get('run_registry')
     if run:ensure_workspace(store,run)
+    root = store.source_root
     profile_path=root/'.skill-tree/installation/profile.json'
     profile=json.loads(profile_path.read_text()) if profile_path.exists() else {'flavor':run.get('admission',{}).get('flavor','general') if run else 'general','facts':{}}
     declaration=root/'.skill-tree/worktree-profile.json'
@@ -1239,6 +1810,17 @@ def environment(store, payload=None):
     if policy.get('schema')!=1:raise RunError('Unsupported worktree environment profile')
     flavor=profile['flavor'];defaults={'general':['build','dist','.cache'],'web':['node_modules','dist','build','.next','.cache'],'unity':['Library','Temp','Logs','obj','Builds']}
     layout=('unity' if profile.get('facts',{}).get('editor') else 'general') if flavor=='director' else flavor
+    web_runtime_path = None
+    if layout=='web':
+        common = common_dir(root)
+        storage = None if common is None else next((directory for directory in (
+            common, Path(local_git_text(root,'rev-parse','--absolute-git-dir')).resolve())
+            if within_directory(root,directory)),None)
+        prerequisite = (f'Web runtime requires a checkout outside Git administrative storage. '
+                        f'Selected checkout {root} lies inside {storage}.' if storage else None)
+        web_runtime_path = {'checkout':str(root),'prerequisite':prerequisite}
+        if prerequisite and payload.get('runtime'):
+            raise RunError(prerequisite)
     missing=[]
     for rel in policy.get('required_files',[]):
         path=Path(rel)
@@ -1253,11 +1835,91 @@ def environment(store, payload=None):
     required_resources=list(policy.get('exclusive_resources',[]))
     if payload.get('runtime') and layout=='unity' and not required_resources:
         raise RunError('Unity runtime requires an explicit Editor/MCP/save/fixture resource policy')
-    for key in required_resources if payload.get('runtime') else []:
-        claim=registry['resources'].get(key) if registry else None
-        if not claim or not run or claim['run_id']!=run['id']:raise RunError('Runtime prerequisite requires exclusive resource: '+key)
+    claims = (registry or {}).get('resources',{})
+    resource_claims = []
+    for key in required_resources:
+        holder = claims.get(key,{}).get('run_id')
+        owned = bool(run and holder == run['id'])
+        resource_claims.append({'resource':key,'holder_run_id':holder,
+                                'status':'owned' if owned else 'occupied' if holder else 'unclaimed'})
+        if payload.get('runtime') and not owned:
+            raise RunError('Runtime prerequisite requires exclusive resource: '+key)
     if missing:raise RunError('Missing environment prerequisites: '+', '.join(missing))
-    return {'flavor':flavor,'project_root':str(root),'isolated_directories':directories,'required_files':policy.get('required_files',[]),'exclusive_resources':required_resources,'editor_version':profile.get('facts',{}).get('editor'),'secrets_read':False,'runtime_qualified':False}
+    result = {'flavor':flavor,'project_root':str(root),'isolated_directories':directories,'required_files':policy.get('required_files',[]),'exclusive_resources':required_resources,'editor_version':profile.get('facts',{}).get('editor'),'secrets_read':False,'runtime_qualified':False}
+    if resource_claims:
+        result['runtime_resource_claims'] = resource_claims
+    if web_runtime_path is not None:
+        result['web_runtime_path'] = web_runtime_path
+    return result
+
+def native_move_matches(root,run,data,owner,registration,origin,path):
+    if runtime(root) != data:
+        raise RunError('Worktree locators changed during relocation')
+    if not path.is_dir() or path.resolve() != path or root.is_relative_to(path):
+        return False
+    retained = {**data.get('pending_worktrees',{}), **data['worktrees']}
+    if any(rid != run['id'] and worktree_paths_overlap(Path(other).resolve(),path) for rid,other in retained.items()):
+        raise RunError('Another controller locates a worktree overlapping the moved destination')
+    registered = registered_worktrees(root)
+    if path not in registered or origin != path and origin in registered:
+        return False
+    if linked_registration(root,path) != registration:
+        return False
+    if checked_out_branch(path)['ref'] != 'refs/heads/'+run['workspace']['branch']:
+        return False
+    return directed_owner(root,path,run,data['queue_id']) == owner
+
+
+def recover_verified_move(store, text, state, run, path, resolution, previous_worktree=None):
+    registry = state['run_registry']
+    try:
+        data, owner, locator, registration = cleanup_worktree_owner(store.root,registry,run)
+        prior = verified_move_chain(run,owner)
+    except RunError:
+        return False
+    anchor = cleanup_origin_sha256(run)
+    if anchor is None:
+        return False
+    locator_sha, target_sha = locator_path_sha256(locator),locator_path_sha256(path)
+    verified_sha = prior['to_locator_sha256'] if prior else anchor
+    pending = (prior and prior['from_locator_sha256'] == locator_sha
+               and prior['to_locator_sha256'] != locator_sha)
+    origin = locator
+    if pending:
+        if target_sha != verified_sha or previous_worktree is not None:
+            raise RunError('Recovery must activate the original recorded relocation destination')
+    elif locator_sha != verified_sha:
+        if not isinstance(previous_worktree,str) or path != locator:
+            raise RunError('The locally recovered worktree location requires the exact previously verified worktree path')
+        origin = Path(previous_worktree)
+        if (not origin.is_absolute() or origin.resolve() != origin
+                or locator_path_sha256(origin) != verified_sha):
+            raise RunError('The supplied previous worktree differs from the exact verified location')
+    elif previous_worktree is not None:
+        previous = Path(previous_worktree) if isinstance(previous_worktree,str) else None
+        if (not prior or path != locator or previous is None or not previous.is_absolute()
+                or previous.resolve() != previous or locator_path_sha256(previous) != prior['from_locator_sha256']):
+            raise RunError('Previous worktree evidence differs from the recorded relocation')
+    if path == origin and not prior:
+        return False
+    if path != origin and run.get('delivery',{}).get('worktree_cleanup',{}).get('attempt'):
+        raise RunError('Reconcile the original prepared cleanup before changing the worktree locator')
+    if run.get('dispatch_workspace_sha256') and run.get('delivery',{}).get('status') != 'merged':
+        return False
+    if not native_move_matches(store.root,run,data,owner,registration,origin,path):
+        return False
+    if path != origin and not pending:
+        receipt = {'kind':'verified-worktree-move','owner':owner,
+                   'from_locator_sha256':locator_path_sha256(origin),'to_locator_sha256':target_sha,
+                   'branch':run['workspace']['branch'],'resolution':resolution}
+        run.setdefault('workspace_recoveries',[]).append(receipt)
+        store.save(text,state,update_navigation=False)
+    if path != locator:
+        if not native_move_matches(store.root,run,data,owner,registration,origin,path):
+            raise RunError('The original native worktree or branch changed before locator activation')
+        activate_worktree_locator(store.root,data,run['id'],path)
+    ensure_workspace(store,run)
+    return True
 
 def recover_workspace(store,payload):
     if not payload.get('resolution'):
@@ -1266,11 +1928,38 @@ def recover_workspace(store,payload):
         text=store.text();state=store.load(text);run=state['active_run']
         if not run or not run.get('workspace'):raise RunError('Select the retained run before workspace recovery')
         data=runtime(store.root);rid=run['id'];spec=run['workspace']
-        requested=payload.get('worktree') or data['worktrees'].get(rid)
+        reserved = run.get('workspace_state') == 'reserved'
+        pending = data.get('pending_worktrees',{}).get(rid) if reserved else None
+        requested=payload.get('worktree') or data['worktrees'].get(rid) or pending
         if not requested:raise RunError('Recovery requires the recorded or explicitly relocated worktree path')
         path=Path(requested).resolve()
-        reserved = run.get('workspace_state') == 'reserved'
         directed = run.get('dispatch_workspace_sha256')
+        if pending is not None and pending != str(path):
+            raise RunError('Recovery requires the original exact worktree path')
+        if (initial_profile_pending(run)
+                and hashlib.sha256(str(path).encode()).hexdigest() != run['initial_profile']['worktree_path_sha256']):
+            raise RunError('Initial profile recovery requires the original exact worktree path')
+        if reserved:
+            anchor = cleanup_origin_sha256(run)
+            if anchor is not None and locator_path_sha256(path) != anchor:
+                if directed:
+                    raise RunError('Director reservation requires the original exact worktree path')
+                raise RunError('Recovery requires the original exact reserved worktree path')
+        if reserved and run['admission']['flavor']=='web':
+            guard_web_destination(data,state['run_registry']['runs'],rid,path)
+            tip = git(store.root,'for-each-ref','--format=%(objectname)','refs/heads/'+spec['branch'])
+            if tip and tip != spec['base_commit']:
+                raise RunError('The reserved Web branch no longer points to the original Git base')
+        relocation_pending = pending_verified_move(run,data['worktrees'].get(rid))
+        if relocation_pending and not payload.get('worktree'):
+            raise RunError('Recovery requires the exact recorded relocation destination')
+        if not reserved and payload.get('worktree') and recover_verified_move(
+                store,text,state,run,path,payload['resolution'],payload.get('previous_worktree')):
+            return run
+        if relocation_pending:
+            raise RunError('The original recorded relocation awaits the verified native worktree')
+        if 'previous_worktree' in payload:
+            raise RunError('Previous worktree evidence requires a verified existing native worktree move')
         owned = directed and (reserved or spec.get('dispatch_owner_token') or spec.get('cleanup_owner'))
         if owned and hashlib.sha256(str(path).encode()).hexdigest() != directed:
             raise RunError('Director reservation requires the original exact worktree path')
@@ -1291,7 +1980,7 @@ def recover_workspace(store,payload):
                 git(store.root,'worktree','add','-b',spec['branch'],path,spec['base_commit'])
         if owned:
             spec['cleanup_owner'] = directed_owner(store.root, path, run, data['queue_id'], created=created)
-        data['worktrees'][rid]=str(path);atomic(runtime_file(store.root),data)
+        activate_worktree_locator(store.root,data,rid,path)
         run['workspace_state']='ready';run.setdefault('workspace_recoveries',[]).append({'resolution':payload['resolution'],'branch':spec['branch']})
         ensure_workspace(store,run);store.save(text,state);return run
 
