@@ -12,7 +12,7 @@ import re
 TOKEN = re.compile(r'[a-z][a-z0-9]*(?:-[a-z0-9]+)*\Z')
 RECORD = re.compile(r'[A-Za-z0-9][A-Za-z0-9_.-]*\Z')
 SHA = re.compile(r'[0-9a-f]{64}\Z')
-OBJECT = re.compile(r'(?:OB|PL|P|T)-[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}\Z')
+OBJECT = re.compile(r'(?:OB|PL|P|T|IB)-[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}\Z')
 WORKSPACES = {'existing-checkout', 'artifact', 'recorded-worktree', 'separate-clone', 'separate-runtime'}
 PIN_STATES = {'verified', 'missing', 'changed', 'unavailable', 'unsupported', 'inferred'}
 
@@ -115,6 +115,44 @@ def compile_pin(areas, value, resolve_pin):
     return {**value, 'status': state}
 
 
+def compile_child_batch(child, effects):
+    fields(child, {'intake_batch_id', 'items'}, {'full_cycle_partition'})
+    require(task_id(child['intake_batch_id'], {'IB'}) and 'intake' in effects
+            and set(effects) <= {'intake', 'process'}, 'Batch requires exact intake identity and bounded queue effects')
+    items = child['items']
+    require(isinstance(items, list) and items, 'Child batch requires ordered intake items')
+    keys = set()
+    for item in items:
+        fields(item, {'key', 'title', 'description', 'acceptance'},
+               {'priority', 'topic', 'pending_depends_on', 'context', 'source', 'priority_reason'})
+        key = item['key']
+        require(token(key) and key not in keys, 'Batch intake requires distinct item keys')
+        keys.add(key)
+        require(all(text(item[field]) for field in ('title', 'description'))
+                and isinstance(item['acceptance'], list) and item['acceptance'] and all(map(text, item['acceptance']))
+                and ('priority' not in item or type(item['priority']) is int)
+                and ('topic' not in item or token(item['topic']))
+                and all(field not in item or text(item[field]) for field in ('context', 'source', 'priority_reason')),
+                'Invalid frozen batch intake item')
+    for item in items:
+        distinct(item.get('pending_depends_on', []), 'batch Pending prerequisites',
+                 lambda value: task_id(value, {'P'}) or isinstance(value, str) and value.startswith('@') and value[1:] in keys)
+    if 'full_cycle_partition' in child:
+        require('process' in effects, 'Full Cycle batch requires an exact process effect')
+        partition = child['full_cycle_partition']
+        fields(partition, {'primary', 'deferred'})
+        primary = set(distinct(partition['primary'], 'primary Full Cycle keys', token, at_least_one=True))
+        deferred = set(distinct(partition['deferred'], 'deferred Full Cycle keys', token, at_least_one=True))
+        require(not (primary & deferred) and primary | deferred == keys
+                and all(partition[role] == [item['key'] for item in items if item['key'] in part]
+                        for role, part in (('primary', primary), ('deferred', deferred))),
+                'Full Cycle partition must cover each original member once in intake order')
+        require(not any(ref.startswith('@') and ref[1:] in deferred for item in items if item['key'] in primary
+                        for ref in item.get('pending_depends_on', [])),
+                'Primary Full Cycle work cannot require a deferred intake item')
+    return deepcopy(child)
+
+
 def compile_child(candidate, child, effects, resolve_child):
     require(isinstance(child, dict), 'Child selection requires existing task or bounded intake')
     if 'task_id' in child:
@@ -124,6 +162,8 @@ def compile_child(candidate, child, effects, resolve_child):
         observed = resolve_child(deepcopy(candidate), deepcopy(child))
         require(observed == child, 'Existing child task is missing or its exact body changed')
         return deepcopy(child)
+    if 'items' in child:
+        return compile_child_batch(child, effects)
     fields(child, {'title', 'description', 'acceptance'})
     require('intake' in effects and text(child['title']) and text(child['description'])
             and isinstance(child['acceptance'], list) and child['acceptance'] and all(map(text, child['acceptance'])),
@@ -163,7 +203,8 @@ def compile_assignment(areas, request, resolve_area, resolve_pin, resolve_child)
 def ordered_assignments(assignments):
     identities = {assignment['id']: assignment for assignment in assignments}
     require(len(identities) == len(assignments), 'Duplicate assignment identity')
-    children = [(item['area']['queue_id'], item['child']['task_id']) for item in assignments if 'task_id' in item['child']]
+    children = [(item['area']['queue_id'], item['child'].get('task_id', item['child'].get('intake_batch_id')))
+                for item in assignments if {'task_id', 'intake_batch_id'} & item['child'].keys()]
     require(len(set(children)) == len(children), 'An exact child task can have only one assignment in this plan')
     for assignment in assignments:
         require(set(assignment['depends_on']) <= identities.keys(),

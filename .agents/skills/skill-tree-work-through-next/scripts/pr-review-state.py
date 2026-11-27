@@ -1,15 +1,19 @@
 #!/usr/bin/env python3
 """Persist exact-head PR review evidence and idempotent publication operations."""
+from contextlib import contextmanager
 from copy import deepcopy
 import argparse
 import hashlib
 import importlib.util
 import json
+import os
 from pathlib import Path
 import re
+import stat
 import subprocess
 import sys
 import tempfile
+from types import SimpleNamespace
 import uuid
 
 def owned_module(name,path):
@@ -48,6 +52,17 @@ except (ValueError,OSError) as error:
 
 class ReviewError(ValueError):
     pass
+
+class HandoffHold(ReviewError):
+    def __init__(self, publication_id, reason, message, **details):
+        super().__init__(message)
+        self.result = {'ok': False, 'status': 'held', 'publication_id': publication_id,
+                       'reason': reason, 'error': message, **details}
+
+
+class ProviderHandoffChanged(ReviewError):
+    pass
+
 
 def digest(value):
     return hashlib.sha256(json.dumps(value,sort_keys=True,ensure_ascii=False).encode()).hexdigest()
@@ -225,11 +240,16 @@ def reconcile(record,snapshot,*,retarget=None):
         record.setdefault('authorization_history',[]).append(previous)
         record['authorization']=deepcopy(authorization)
     pr=snapshot.get('pr')
-    if record.get('pr') and pr and record['pr']['id']!=pr['id']:raise ReviewError('Existing PR identity conflict')
+    if record.get('pr') and pr and (record['pr']['id']!=pr['id']
+            or ('final_validation' in record and record['pr'] != pr)):
+        raise ReviewError('Existing PR identity conflict')
     if pr:record['pr']=pr
     current_identity=identity(snapshot)
     changed=record['identity']!=current_identity or record.get('snapshot_key')!=review_key(snapshot)
     if record['identity']!=current_identity:
+        if 'final_validation' in record:
+            record['final_validation'].pop('code_review', None)
+            record['final_validation']['phase'] = 'code-review'
         for finding in record.get('findings',{}).values():
             if finding.get('status') in {'verified-fixed','dismissed'}:
                 finding['status']='open'
@@ -245,6 +265,9 @@ def reconcile(record,snapshot,*,retarget=None):
             raise ReviewError('Merged provider result lacks merge commit evidence')
         if target_changed or record.get('merge_commit') != integration:
             record.pop('local_target_sync', None)
+            maintenance = record.pop('profile_maintenance', None)
+            if maintenance:
+                record.setdefault('profile_maintenance_history', []).append(maintenance)
         record['status'] = 'merged'
         record['merge_commit'] = integration
         record['same_repository'] = snapshot.get('same_repository') is True
@@ -391,10 +414,22 @@ def reviewed(record,snapshot,payload,*,store=None):
     ledger.update(observed)
     findings.extend(observed.values())
     unresolved=unresolved_findings(record,snapshot,enabled=enabled)
-    record['review']={'key':review_key(snapshot),'head':snapshot['head'],'base_oid':snapshot['base_oid'],'findings':findings,'unresolved':len(unresolved),'independent_approval':False,'evidence':payload.get('evidence',[])}
+    record['review']={'key':review_key(snapshot),'head':snapshot['head'],'base_oid':snapshot['base_oid'],
+                      'target_branch':snapshot['target_branch'],'findings':findings,'unresolved':len(unresolved),
+                      'independent_approval':False,'evidence':payload.get('evidence',[])}
     if notes:
         record['review']['development_policy_notes'] = notes
     record['rounds']=record.get('rounds',[])+[deepcopy(record['review'])]
+    if 'final_validation' in record:
+        state = record['final_validation']
+        if unresolved:
+            state.pop('code_review', None)
+            state['phase'] = 'code-review'
+        elif snapshot.get('pr'):
+            candidate = final_validation_candidate(record, snapshot)
+            if state.get('code_review') != candidate:
+                state['code_review'] = candidate
+                state['phase'] = 'final-validation'
     return record
 
 
@@ -419,6 +454,195 @@ def inspected(record,snapshot,payload):
     if any(payload.get(key)!=snapshot[key] for key in ['head','base_oid','target_branch']) or set(payload.get('files',[]))!=set(snapshot['changed_files']) or not all(payload.get(key) is True for key in ['context_inspected','discussions_inspected','checks_inspected']):raise ReviewError('Current complete core inspection is required')
     record['inspection']={'key':review_key(snapshot),'head':snapshot['head'],'base_oid':snapshot['base_oid'],'files':deepcopy(snapshot['changed_files']),'evidence':deepcopy(payload.get('evidence',[]))}
     return record
+
+
+def existing_source_checkout(store, selected, record, publication_id, snapshot=None):
+    provider_pr = (record or {}).get('pr')
+    if (not isinstance(provider_pr,dict) or record.get('publication_id') != publication_id
+            or type(provider_pr.get('number')) is not int or provider_pr['number'] < 1
+            or any(not isinstance(provider_pr.get(field),str) or not provider_pr[field].strip()
+                   for field in ('id','url'))):
+        raise ReviewError('Select the existing exact publication and complete provider PR identity')
+    if record.get('status') == 'merged':
+        raise ReviewError('Continue the merged publication through ordinary delivery reconciliation')
+    saved = record['identity']
+    if snapshot is not None:
+        if (snapshot.get('state') != 'OPEN' or identity(snapshot) != saved
+                or snapshot.get('pr') != record['pr']):
+            raise ReviewError('Resume requires the original open PR, exact head, base and target')
+    path, checkout = ws.verified_pr_source_worktree(store.root,selected,saved['source_branch'],saved['head'])
+    if ws.repo_id(path) != saved['repo_id']:
+        raise ReviewError('The source checkout belongs to a different publication repository')
+    remote = saved['remote']
+    url = ws.local_git_text(path,'remote','get-url','--',remote)
+    if hashlib.sha256(url.encode()).hexdigest() != saved.get('remote_id'):
+        raise ReviewError('The selected source checkout has a different publication remote')
+    if publication_repositories(path,saved,url,remote) != repository_scope(saved):
+        raise ReviewError('The selected source checkout has different publication repositories')
+    if ws.local_git_text(path,'rev-parse','--verify',saved['base_oid']+'^{commit}') != saved['base_oid']:
+        raise ReviewError('The selected source checkout lacks the original target base')
+    return {'path':str(path),**checkout}
+
+
+def existing_source_files(checkout, saved):
+    output = ws.local_git(Path(checkout['path']),'diff','--name-only','--no-ext-diff','--no-textconv','-z',
+                          saved['base_oid']+'...'+saved['head'],'--').stdout
+    paths = [os.fsdecode(name) for name in output.split(b'\0') if name]
+    if not paths:
+        raise ReviewError('The selected publication has no changes relative to the original target base')
+    return paths
+
+
+def existing_source_preflight(root, payload, publication_id):
+    if not publication_id:
+        raise ReviewError('A source checkout selection requires the existing publication ID')
+    wf=owned_module('pr_source_preflight_workflow',Path(__file__).with_name('workflow-state.py'))
+    store=wf.Store(ws.canonical(root),allow_unselected=True,neutral=True)
+    carrier=_review_path(store,publication_id)
+    raw = _regular_input(carrier, 'Publication receipts', 16 * 1024 * 1024)
+    if raw is None:
+        raise ReviewError('Select the existing exact publication and provider PR identity')
+    record=json.loads(raw)
+    if not isinstance(record, dict) or record.get('publication_id') != publication_id:
+        raise ReviewError('Select the existing exact publication and provider PR identity')
+    verified=existing_source_checkout(store,payload['source_checkout'],record,publication_id,payload.get('snapshot'))
+    saved=record['identity']
+    changed=existing_source_files(verified,saved)
+    if payload.get('snapshot') is not None and set(payload['snapshot'].get('changed_files',[])) != set(changed):
+        raise ReviewError('Current provider diff differs from the verified source checkout')
+    if (existing_source_checkout(store,payload['source_checkout'],record,publication_id,payload.get('snapshot')) != verified
+            or _regular_input(carrier, 'Publication receipts', 16 * 1024 * 1024) != raw):
+        raise ReviewError('The original publication checkout changed during preflight')
+    return {**saved,'publication_id':publication_id,'pr':record['pr'],'status':record['status'],
+            'authorization':record['authorization'],'source_checkout':verified,'changed_files':changed,
+            'publication_sha256':hashlib.sha256(raw).hexdigest(),
+            'requires_frozen_review_generation':bool(record.get('review_requirements')),
+            'candidate_objects_required':True}
+
+
+def handoff_provider_scope(checkout, checked):
+    url = ws.local_git_text(checkout, 'remote', 'get-url', '--', checked['remote'])
+    if hashlib.sha256(url.encode()).hexdigest() != checked['remote_id']:
+        raise ProviderHandoffChanged('The verified publication remote changed')
+    host, base = github_remote(url)
+    retained = repository_scope(checked)
+    if retained and (retained.get('base_repository') != base or not retained.get('head_repository')):
+        raise ProviderHandoffChanged('The retained GitHub repository scope is incomplete or changed')
+    return host, base, retained.get('head_repository', base), not retained
+
+
+def handoff_provider_policy(policy, host, base, target):
+    fields = {'host', 'repository', 'target_branch', 'reference',
+              'required_check_names', 'approvals_required'}
+    if (not isinstance(policy, dict) or set(policy) != fields
+            or (policy['host'], policy['repository'], policy['target_branch']) != (host, base, target)
+            or not isinstance(policy['reference'], str) or not policy['reference'].strip()
+            or type(policy['approvals_required']) is not bool):
+        raise ReviewError('Inspect the required checks and approvals for the exact GitHub repository and target')
+    names = policy['required_check_names']
+    if (not isinstance(names, list) or any(not isinstance(name, str) or not name.strip() for name in names)
+            or len(set(names)) != len(names)):
+        raise ReviewError('Inspect the complete required-check policy for the exact target')
+    return {'checks_known': True, 'approvals_known': True, 'required_check_names': names,
+            'approvals_required': policy['approvals_required']}
+
+
+def handoff_pending_operations(record):
+    pending = []
+    operations = record.get('operations')
+    if not isinstance(operations, dict):
+        raise ReviewError('The retained publication operation inventory is incomplete')
+    for key, operation in sorted(operations.items()):
+        if (not isinstance(key, str) or not key or not isinstance(operation, dict)
+                or not isinstance(operation.get('request_digest'), str)
+                or not re.fullmatch(r'[a-f0-9]{64}', operation['request_digest'])
+                or operation.get('state') not in {'prepared', 'confirmed'}
+                or (operation.get('result') is None) != (operation['state'] == 'prepared')):
+            raise ReviewError('The retained publication operation receipt requires reconciliation')
+        if operation['state'] == 'prepared':
+            pending.append({'key': key, 'request_digest': operation['request_digest']})
+    return pending
+
+
+def prepare_handoff(root, payload, publication_id):
+    required = {'source_checkout', 'head', 'base_oid'}
+    if (not required.issubset(payload) or set(payload) - required - {'provider_policy', 'expected_publication_sha256'}
+            or any(not isinstance(payload[key], str) or not re.fullmatch(r'[a-f0-9]{40}|[a-f0-9]{64}', payload[key])
+                   for key in ('head', 'base_oid'))):
+        raise HandoffHold(publication_id, 'request-incomplete',
+                          'Supply the original source checkout, expected head and expected target base')
+    source = {'source_checkout': payload['source_checkout']}
+    try:
+        checked = existing_source_preflight(root, source, publication_id)
+        canonical = ws.canonical(root)
+        carrier = _review_path(SimpleNamespace(root=canonical), publication_id)
+        raw = _regular_input(carrier, 'Publication receipts', 16 * 1024 * 1024)
+        if raw is None or hashlib.sha256(raw).hexdigest() != checked['publication_sha256']:
+            raise ReviewError('The original publication record changed during preflight')
+        record = json.loads(raw)
+    except (OSError, ValueError, KeyError, TypeError, subprocess.TimeoutExpired) as error:
+        raise HandoffHold(publication_id, 'publication-or-checkout-unavailable',
+                          'Select the exact existing publication and verified source checkout') from error
+    if (any(payload[key] != checked[key] for key in ('head', 'base_oid'))
+            or payload.get('expected_publication_sha256', checked['publication_sha256']) != checked['publication_sha256']):
+        raise HandoffHold(publication_id, 'publication-changed',
+                          'Reinspect the original publication head, target base or receipt')
+    authorization = checked['authorization']
+    if (not isinstance(authorization, dict) or authorization.get('origin') != 'owner'
+            or authorization.get('pr') is not True):
+        raise HandoffHold(publication_id, 'publication-authority-unavailable',
+                          'The original publication requires a retained direct owner grant')
+    try:
+        pending = handoff_pending_operations(record)
+    except ReviewError as error:
+        raise HandoffHold(publication_id, 'operation-reconciliation-required', str(error)) from error
+    if pending:
+        raise HandoffHold(publication_id, 'operation-reconciliation-required',
+                          'Reconcile the original operation against provider evidence before continuing',
+                          operations=pending,
+                          recovery={'command': 'operation', 'publication_id': publication_id})
+    checkout = Path(checked['source_checkout']['path'])
+    try:
+        host, base, head_repository, same_repository_required = handoff_provider_scope(checkout, checked)
+    except (OSError, ValueError, KeyError, TypeError, subprocess.TimeoutExpired) as error:
+        raise HandoffHold(publication_id, 'provider-scope-unavailable',
+                          'Restore the GitHub repository scope bound to the original publication') from error
+    try:
+        policy = handoff_provider_policy(payload.get('provider_policy'), host, base, checked['target_branch'])
+    except ReviewError as error:
+        raise HandoffHold(publication_id, 'provider-policy-unavailable', str(error)) from error
+    context = identity(checked)
+    adapter_context = {**context, 'base_repository': base, 'head_repository': head_repository}
+    try:
+        provider = GitHub.from_preflight(checkout, adapter_context, host=host)
+        snapshot = provider.snapshot(checked['pr']['number'], adapter_context, policy,
+                                     expected_pr=checked['pr'], same_repository_required=same_repository_required)
+    except ProviderHandoffChanged as error:
+        raise HandoffHold(publication_id, 'provider-pr-changed', str(error)) from error
+    except (OSError, ValueError, KeyError, TypeError, subprocess.TimeoutExpired) as error:
+        raise HandoffHold(publication_id, 'provider-inspection-unavailable',
+                          'Restore access to GitHub PR, discussion, review and check inspection') from error
+    for key in repository_scope(snapshot).keys() - repository_scope(checked).keys():
+        snapshot.pop(key)
+    if (identity(snapshot) != context or snapshot.get('pr') != checked['pr']
+            or snapshot.get('state') != 'OPEN' or sorted(snapshot['changed_files']) != sorted(checked['changed_files'])):
+        raise HandoffHold(publication_id, 'provider-pr-changed',
+                          'The current provider PR or complete file set differs from the original publication')
+    try:
+        final = existing_source_preflight(root, {**source, 'snapshot': snapshot}, publication_id)
+    except (OSError, ValueError, KeyError, TypeError, subprocess.TimeoutExpired) as error:
+        raise HandoffHold(publication_id, 'publication-changed',
+                          'The original publication or source checkout changed during provider inspection') from error
+    if final != checked:
+        raise HandoffHold(publication_id, 'publication-changed',
+                          'The original publication or source checkout changed during provider inspection')
+    return {'status': 'handoff-prepared', 'publication_id': publication_id, 'pr': checked['pr'],
+            'head': checked['head'], 'base_oid': checked['base_oid'],
+            'publication_sha256': checked['publication_sha256'],
+            'provider_policy_reference': payload['provider_policy']['reference'],
+            'next': {'command': 'observe', 'root': str(canonical), 'publication_id': publication_id,
+                     'input': {**source, 'snapshot': snapshot,
+                               'expected_publication_sha256': checked['publication_sha256']}}}
 
 
 def review_phase_guard(store,context,phase):
@@ -466,15 +690,18 @@ def _review_root(store,record,package_root=None):
     return None
 
 
-def review_requirement_plan(store,snapshot,*,package_root=None,run_overrides=None,record=None,publication_id=None):
+def review_requirement_plan(store,snapshot,*,package_root=None,run_overrides=None,record=None,publication_id=None,verified_watch=None):
     if getattr(store,'_writer_active',False):raise ReviewError('Review requirement preparation must run outside the writer lock')
     root=_review_root(store,record,package_root)
     if root is None:return None
     wf=owned_module('review_requirement_workflow',Path(__file__).with_name('workflow-state.py'))
-    watch=wf._hook_watch(root,store.source_root);manifest=json.loads((root/'references/plugin-bindings.json').read_text())
+    watch=wf._hook_watch(root,store.source_root) if verified_watch is None else verified_watch
+    manifest=json.loads((root/'references/plugin-bindings.json').read_text())
     if not manifest.get('definitions') and not (record or {}).get('review_requirements'):return None
     phases={};proofs={};configuration=None
     for phase in ['before','during','after']:
+        if verified_watch is not None:
+            wf._hook_watch_guard(watch,root)
         context=hook_context(snapshot)
         if publication_id:context['publication_id']=publication_id
         value=wf._hook_node(root,{'runtime_action':'requirement-plan','project_root':str(store.source_root),'event':{'id':'review-requirements-'+phase,'operation':REVIEW_OPERATION,'anchor':phase},'context':context,'capabilities':['codex-source-backed-context'],'adapter':{'provider':'codex','mechanism':'source-backed-context'},'run_overrides':deepcopy(run_overrides or {})})
@@ -482,6 +709,59 @@ def review_requirement_plan(store,snapshot,*,package_root=None,run_overrides=Non
         configuration=value['configuration'];proof=value['proof'];proofs[phase]=proof
         phases[phase]=[row['id'] for row in proof['bindings']]+[row['id'] for row in proof.get('unresolved',[])]
     return {'configuration':configuration,'phases':phases,'proofs':proofs,'watch':watch,'package_root':str(root)}
+
+
+def isolated_review_requirements(store, snapshot, record, key, workflow):
+    frozen = record.get('review_requirements')
+    source = store.source_root
+    if not frozen:
+        # Detect newly configured review packages without executing a candidate.
+        registry = _profile_input(source,'.skill-tree/installation/plugins.json')
+        bindings = json.loads(registry).get('bindings',[]) if registry else []
+        if any(row.get('operation') == REVIEW_OPERATION and row.get('enabled') for row in bindings):
+            raise ReviewError('The selected checkout requires an original frozen review plan')
+        profile = _profile_input(source,'.skill-tree/installation/profile.json')
+        destinations = json.loads(profile).get('destinations',{}) if profile else {}
+        candidates = [Path(__file__).resolve().parent.parent]
+        candidates.extend(_profile_path(source,relative) for relative,item in destinations.items()
+                          if item.get('name') == REVIEW_OPERATION)
+        for candidate in candidates:
+            manifest = _profile_input(candidate,'references/plugin-bindings.json')
+            if manifest:
+                declaration = json.loads(manifest)
+                if declaration.get('operation') == REVIEW_OPERATION and declaration.get('definitions'):
+                    raise ReviewError('The selected checkout requires an original frozen review plan')
+        return None
+
+    relative = frozen.get('operation_package')
+    expected = frozen.get('execution_snapshot',{})
+    if not isinstance(relative,str) or not isinstance(expected,dict):
+        raise ReviewError('The selected checkout cannot prove the frozen review package')
+    package = _profile_path(source,relative)
+    manifest_path = 'references/plugin-bindings.json'
+    manifest = _profile_input(package,manifest_path)
+    if not manifest or hashlib.sha256(manifest).hexdigest() != expected.get('operation-manifest'):
+        raise ReviewError('The selected checkout cannot prove the frozen review package')
+    profile_path = '.skill-tree/installation/profile.json'
+    profile = _profile_input(source,profile_path)
+    profile_digest = hashlib.sha256(profile).hexdigest() if profile is not None else None
+    if 'owned-profile' not in expected or profile_digest != expected['owned-profile']:
+        raise ReviewError('The selected checkout differs from the frozen review generation; reconcile it through the original owned review route')
+
+    watch = workflow._hook_watch(package,source)
+    manifest_inventory = json.loads(manifest).get('owned_resources',{})
+    retained_inventory = {name.removeprefix('owned/'):value
+                          for name,value in expected.items() if name.startswith('owned/')}
+    if (retained_inventory != manifest_inventory
+            or watch.get(str(package/manifest_path)) != expected['operation-manifest']
+            or watch.get(str(source/profile_path)) != profile_digest):
+        raise ReviewError('The selected checkout differs from the frozen review package')
+    prepared = review_requirement_plan(store,snapshot,package_root=package,record=record,
+        run_overrides=frozen['configuration'].get('run_overrides',{}),publication_id=key,verified_watch=watch)
+    if (prepared['configuration']['configuration_digest'] != frozen['configuration_digest']
+            or prepared['proofs']['after']['execution_snapshot'] != expected):
+        raise ReviewError('The selected checkout differs from the frozen review generation; reconcile it through the original owned review route')
+    return prepared
 
 
 def _frozen_review_requirements(store,prepared,history=None):
@@ -654,6 +934,200 @@ def api_lock_admission(store,snapshot):
             'plugin_id':'api-lock-review','stage':'before-pr-ready'}
 
 
+def final_validation_candidate(record, snapshot):
+    pr = snapshot.get('pr')
+    if (not isinstance(pr, dict) or record.get('pr') != pr
+            or not isinstance(pr.get('id'), str) or not pr['id']
+            or type(pr.get('number')) is not int or pr['number'] < 1
+            or not isinstance(pr.get('url'), str) or not pr['url']):
+        raise ReviewError('Final validation requires the exact current provider PR')
+    return digest({'scope': identity(snapshot), 'pr': pr,
+                   'files': sorted(snapshot['changed_files']),
+                   'definition': record['final_validation']['definition_sha256']})
+
+
+@contextmanager
+def offline_candidate_git():
+    limits = {'GIT_NO_LAZY_FETCH': '1', 'GIT_ALLOW_PROTOCOL': ''}
+    original = {name: os.environ.get(name) for name in limits}
+    os.environ.update(limits)
+    try:
+        yield
+    finally:
+        for name, value in original.items():
+            if value is None:
+                os.environ.pop(name, None)
+            else:
+                os.environ[name] = value
+
+
+def final_validation_checkout(store, snapshot):
+    if store is None or not snapshot.get('candidate_objects_required'):
+        raise ReviewError('Final validation requires the verified source checkout and Git candidate')
+    root, checkout = ws.verified_pr_source_worktree(
+        store.root, str(store.source_root), snapshot['source_branch'], snapshot['head'])
+    target_ref = 'refs/remotes/' + snapshot['remote'] + '/' + snapshot['target_branch']
+    if (ws.repo_id(root) != snapshot['repo_id']
+            or ws.local_git_text(root, 'rev-parse', '--verify', target_ref + '^{commit}') != snapshot['base_oid']):
+        raise ReviewError('Final validation checkout differs from the current repository or base')
+    remote = ws.local_git_text(root, 'remote', 'get-url', '--', snapshot['remote'])
+    if (hashlib.sha256(remote.encode()).hexdigest() != snapshot.get('remote_id')
+            or publication_repositories(root, snapshot, remote, snapshot['remote']) != repository_scope(snapshot)):
+        raise ReviewError('Final validation remote differs from the reviewed remote')
+    if set(existing_source_files({'path': str(root)}, snapshot)) != set(snapshot['changed_files']):
+        raise ReviewError('Final validation requires the full reviewed diff')
+    with tempfile.TemporaryDirectory(prefix='skill-tree-final-validation-') as temporary:
+        index = Path(temporary) / 'index'
+        ws.local_git(root, 'read-tree', snapshot['head'], index=index)
+        if ws.local_git(root, '-c', 'core.filemode=true', 'status', '--porcelain', '-z',
+                        '--untracked-files=all', index=index).stdout:
+            raise ReviewError('Final validation requires the exact committed source bytes')
+    return root, digest({'path': str(root), 'registration': checkout['checkout']})
+
+def final_validation_definition(root, head, path):
+    if not isinstance(path, str) or not path:
+        raise ReviewError('Final validation requires a committed definition path')
+    full = _profile_path(root, path)
+    if '.git' in Path(path).parts:
+        raise ReviewError('Final validation paths must be outside Git metadata')
+    entry = ws.local_git(root, 'ls-tree', '-z', head, '--', path).stdout
+    match = re.fullmatch(rb'100(?:644|755) blob ([a-f0-9]{40}|[a-f0-9]{64})\t[^\0]+\0', entry)
+    if not match:
+        raise ReviewError('Final validation definition must be a committed regular file')
+    blob = match[1].decode()
+    if int(ws.local_git_text(root, 'cat-file', '-s', blob)) > 65536:
+        raise ReviewError('Final validation definition exceeds the read limit')
+    raw = ws.local_git(root, 'cat-file', 'blob', blob).stdout
+    if _regular_input(full, 'Final validation definition', 65536) != raw:
+        raise ReviewError('Final validation definition differs from the reviewed commit')
+    definition = json.loads(raw)
+    checks = definition.get('checks') if isinstance(definition, dict) and set(definition) == {'checks'} else None
+    if not isinstance(checks, list) or not checks:
+        raise ReviewError('Final validation definition requires a nonempty checks list')
+    ids = set()
+    for check in checks:
+        if (not isinstance(check, dict) or set(check) != {'id', 'argv'}
+                or not isinstance(check['id'], str) or not re.fullmatch(r'[a-z][a-z0-9-]{0,63}', check['id'])
+                or check['id'] in ids or not isinstance(check['argv'], list) or not check['argv']
+                or any(not isinstance(arg, str) or '\0' in arg for arg in check['argv'])
+                or not check['argv'][0]):
+            raise ReviewError('Final validation checks require distinct IDs and exact argument vectors')
+        ids.add(check['id'])
+    return {'path': path, 'definition_sha256': hashlib.sha256(raw).hexdigest(), 'checks': checks}
+
+
+def final_validation_inputs(store, snapshot, path):
+    with offline_candidate_git():
+        root, checkout = final_validation_checkout(store, snapshot)
+        return root, checkout, final_validation_definition(root, snapshot['head'], path)
+
+
+def declare_final_validation(store, record, snapshot, request, *, existing):
+    if not isinstance(request, dict) or set(request) != {'path'}:
+        raise ReviewError('Final validation declaration requires one exact definition path')
+    if snapshot.get('state') in {'CLOSED', 'MERGED'}:
+        raise ReviewError('Declare final validation before publication closes')
+    _, _, definition = final_validation_inputs(store, snapshot, request['path'])
+    state = record.get('final_validation')
+    if existing:
+        if state is None or any(state.get(key) != value for key, value in definition.items()):
+            raise ReviewError('The publication already binds a different final validation declaration')
+        return
+    record['final_validation'] = {
+        **definition, 'phase': 'code-review', 'attempts': {},
+        'evidence_root': '.skill-tree/local/pr-final-validation/' + record['publication_id'],
+    }
+
+
+def verified_final_validation(store, record, snapshot):
+    if snapshot.get('state') != 'OPEN':
+        raise ReviewError('Final validation requires a confirmed open provider PR')
+    state = record['final_validation']
+    candidate = final_validation_candidate(record, snapshot)
+    if state.get('code_review') != candidate or unresolved_findings(record, snapshot, store):
+        raise ReviewError('Complete the current code review and resolve findings before final validation')
+    root, checkout, definition = final_validation_inputs(store, snapshot, state['path'])
+    if any(state.get(key) != value for key, value in definition.items()):
+        raise ReviewError('Final validation definition differs from the original publication declaration')
+    return root, candidate, checkout
+
+
+def final_validation_results(root, state, attempt_id, attempt, results):
+    checks = state['checks']
+    if (not isinstance(results, list) or any(not isinstance(row, dict) for row in results)
+            or [row.get('id') for row in results] != [check['id'] for check in checks]):
+        raise ReviewError('Final validation requires one result per declared check in declaration order')
+    for row, check in zip(results, checks):
+        evidence = row.get('evidence')
+        path = f"{state['evidence_root']}/{attempt_id}/{check['id']}.json"
+        if (set(row) != {'id', 'exit_code', 'evidence'} or type(row['exit_code']) is not int
+                or not isinstance(evidence, dict) or set(evidence) != {'path', 'sha256'}
+                or evidence['path'] != path or not isinstance(evidence['sha256'], str)
+                or not re.fullmatch(r'[a-f0-9]{64}', evidence['sha256'])):
+            raise ReviewError('Final validation requires evidence at the exact attempt and check path')
+        raw = _regular_input(_profile_path(root, path), 'Final validation evidence', 16*1024*1024)
+        if not raw or hashlib.sha256(raw).hexdigest() != evidence['sha256']:
+            raise ReviewError('Final validation evidence is missing or changed for ' + check['id'])
+        observed = json.loads(raw)
+        expected = {'attempt_id': attempt_id, 'candidate': attempt['candidate'], 'check_id': check['id'],
+                    'argv': check['argv'], 'exit_code': row['exit_code']}
+        if (not isinstance(observed, dict) or set(observed) != set(expected) | {'output'}
+                or type(observed.get('exit_code')) is not int or not isinstance(observed.get('output'), str)
+                or any(observed.get(key) != value for key, value in expected.items())):
+            raise ReviewError('Final validation evidence does not match the prepared command and result')
+    return all(row['exit_code'] == 0 for row in results)
+
+
+def current_final_pass(root, state, candidate, checkout):
+    for attempt_id, attempt in state['attempts'].items():
+        if attempt['candidate'] == candidate and attempt['checkout'] == checkout and attempt['status'] == 'passed':
+            try:
+                if final_validation_results(root, state, attempt_id, attempt, attempt['results']):
+                    return True
+            except (OSError, ValueError):
+                continue
+    return False
+
+
+def final_validation_transition(store, record, snapshot, request):
+    record = reconcile(record, snapshot)
+    if snapshot.get('state') != 'OPEN' or record['status'] in {'blocked', 'merged'} or 'final_validation' not in record:
+        raise ReviewError('Final validation requires an open publication with a declared suite')
+    if not isinstance(request, dict) or request.get('action') not in ('prepare', 'record'):
+        raise ReviewError('Final validation requires a prepare or record action')
+    action = request['action']
+    attempt_id = request.get('attempt_id')
+    fields = {'action', 'attempt_id'} | ({'results'} if action == 'record' else set())
+    if set(request) != fields or not isinstance(attempt_id, str) or not re.fullmatch(r'[a-z0-9][a-z0-9-]{0,63}', attempt_id):
+        raise ReviewError('Final validation requires an exact attempt ID and action payload')
+    if action == 'prepare' and any(not thread.get('resolved') and (thread.get('required') or thread.get('actionable'))
+                                   for thread in snapshot.get('threads', [])):
+        raise ReviewError('Resolve current mandatory or actionable discussions before final validation')
+    root, candidate, checkout = verified_final_validation(store, record, snapshot)
+    state = record['final_validation']
+    attempts = state['attempts']
+    attempt = attempts.get(attempt_id)
+    if attempt and (attempt['candidate'] != candidate or attempt['checkout'] != checkout):
+        raise ReviewError('Final validation attempt belongs to a different candidate or checkout')
+    if action == 'prepare':
+        if attempt is not None:
+            return record
+        if any(row['status'] == 'prepared' and row['candidate'] == candidate for row in attempts.values()):
+            raise ReviewError('Reconcile the original prepared final validation attempt')
+        if current_final_pass(root, state, candidate, checkout):
+            raise ReviewError('The current final validation pass remains available')
+        attempts[attempt_id] = {'candidate': candidate, 'checkout': checkout, 'status': 'prepared'}
+    else:
+        if attempt is None:
+            raise ReviewError('Prepare the exact final validation attempt before recording results')
+        results = request['results']
+        if attempt['status'] != 'prepared' and attempt['results'] != results:
+            raise ReviewError('Final validation result replay conflicts with the original result')
+        passed = final_validation_results(root, state, attempt_id, attempt, results)
+        attempt.update(status='passed' if passed else 'failed', results=deepcopy(results))
+    return record
+
+
 def ready(record,snapshot,*,store=None):
     ws.validate_hook_references(record)
     if store is not None:record=_retire_review_hook_references(store,record,snapshot)
@@ -667,8 +1141,14 @@ def ready(record,snapshot,*,store=None):
         if api_locks:record['api_lock_review']=api_locks
         else:record.pop('api_lock_review',None)
     if not record.get('pr') or not record['pr'].get('id') or not record['pr'].get('url'):raise ReviewError('PR readiness requires the existing provider PR identity and URL')
-    review=record.get('review')
-    if not review or review['key']!=review_key(snapshot):
+    if 'final_validation' in record:
+        if record.get('inspection', {}).get('key') != review_key(snapshot):
+            raise ReviewError('Inspect current provider discussions and checks before readiness')
+        root, candidate, checkout = verified_final_validation(store, record, snapshot)
+        if not current_final_pass(root, record['final_validation'], candidate, checkout):
+            raise ReviewError('Current candidate has no verified passing final validation')
+        record['final_validation']['phase'] = 'qualified'
+    elif record.get('review', {}).get('key') != review_key(snapshot):
         raise ReviewError('Current full review or actionable finding verification remains incomplete')
     unresolved = unresolved_findings(record, snapshot, store)
     if unresolved:
@@ -697,9 +1177,117 @@ def merge_gate(record,snapshot,*,store=None):
     if snapshot.get('mergeable')!='MERGEABLE':raise ReviewError('Merge conflict or unknown mergeability')
     return record
 
+
+def reviewed_bases(record, head, target):
+    """Read retained reviews of this source head and target in newest-first order."""
+    legacy_target_known = all(row.get('target_branch') == target for row in record.get('authorization_history', []))
+    bases = []
+    for review in reversed(record.get('rounds', []) + ([record['review']] if record.get('review') else [])):
+        if review.get('head') != head:
+            continue
+        round_target = review.get('target_branch')
+        sha, key = review.get('base_oid'), review.get('key')
+        if ((round_target == target or (round_target is None and legacy_target_known))
+                and isinstance(sha,str) and len(sha) == len(head) and re.fullmatch(r'[a-f0-9]+',sha)
+                and isinstance(key,str) and re.fullmatch(r'[a-f0-9]{64}',key)):
+            bases.append(sha)
+    return bases
+
+
+def workflow_diff(root, base, head):
+    environment = {**ws.local_git_environment(), 'GIT_NO_LAZY_FETCH':'1', 'GIT_ALLOW_PROTOCOL':''}
+    unavailable = {'status':'unavailable','paths':[]}
+
+    def git(*args, input_data=None):
+        return subprocess.run(ws.local_git_args(root,*args), env=environment, input=input_data,
+                              capture_output=True, timeout=15)
+
+    try:
+        objects = git('cat-file','--batch-check=%(objectname) %(objecttype)',
+                      input_data=(base+'\n'+head+'\n').encode('ascii'))
+        if objects.returncode or objects.stdout.splitlines() != [(sha+' commit').encode('ascii') for sha in (base,head)]:
+            return unavailable
+        bases = git('merge-base','--all',base,head)
+        if bases.returncode or len(bases.stdout.splitlines()) != 1:
+            return unavailable
+        common = bases.stdout.strip().decode('ascii')
+        if len(common) != len(head) or not re.fullmatch(r'[a-f0-9]+',common):
+            return unavailable
+        result = git('diff','--name-only','--no-renames','--no-ext-diff','--no-textconv','-z',
+                     common,head,'--','.github/workflows')
+        if result.returncode:
+            return unavailable
+        paths = sorted(name.decode('utf-8') for name in result.stdout.split(b'\0')
+                       if name.startswith(b'.github/workflows/'))
+    except (OSError, UnicodeError, subprocess.TimeoutExpired):
+        return unavailable
+    return {'status':'observed','paths':paths}
+
+
+def scoped_refusal(status, message):
+    return (type(status) is int and 400 <= status < 500 and status != 408
+            and isinstance(message,str) and 0 < len(message) <= 2048 and bool(message.strip())
+            and all(32 <= ord(char) < 127 or ord(char) >= 160 for char in message)
+            and not re.search(r'\b(?:gh[pousr]_\w{10,}|github_pat_\w{10,}|Bearer\s+[\w./=-]{8,})'
+                              r'|https?://[^/\s]+@', message, re.I))
+
+
+def merge_denial_preview(root, record, payload):
+    allowed = {'snapshot','provider_refusal','expected_publication_sha256'}
+    if set(payload) - allowed or not isinstance(payload.get('snapshot'), dict):
+        raise ReviewError('Merge denial preview requires the exact publication and provider snapshot')
+    snapshot = payload['snapshot']
+    expected_pr, pr = record.get('pr'), snapshot.get('pr')
+    if (not isinstance(expected_pr, dict) or not isinstance(pr, dict) or snapshot.get('state') != 'OPEN'
+            or type(expected_pr.get('id')) not in (int,str) or not expected_pr['id']
+            or type(expected_pr.get('number')) is not int or expected_pr['number'] < 1
+            or not isinstance(expected_pr.get('url'),str) or not expected_pr['url']
+            or any(type(expected_pr[key]) is not type(pr.get(key)) or expected_pr[key] != pr[key]
+                   for key in ('id','number','url'))):
+        raise ReviewError('Merge denial preview requires the original open provider PR')
+    for key in ('head','base_oid'):
+        if not isinstance(snapshot.get(key), str) or re.fullmatch(r'[a-f0-9]{40}|[a-f0-9]{64}', snapshot[key]) is None:
+            raise ReviewError('Merge denial preview requires exact provider head and base objects')
+    reconcile(record, snapshot)
+    head, base, target = (snapshot[key] for key in ('head','base_oid','target_branch'))
+    historical_bases = reviewed_bases(record, head, target)
+    previous = historical_bases[0] if historical_bases else None
+    drift = 'unknown' if previous is None else 'unchanged' if previous == base else 'moved'
+    refusal = payload.get('provider_refusal')
+    if refusal is not None:
+        required = {'provider','repository','number','head','http_status','message','target_branch','attempted_base_oid'}
+        repository = record['identity'].get('base_repository')
+        if repository is None:
+            match = re.fullmatch(r'https://[^/]+/([\w.-]+/[\w.-]+)/pull/([1-9][0-9]*)', expected_pr.get('url') or '')
+            if match and int(match[2]) == expected_pr['number']:
+                repository = match[1].lower()
+        accepted_bases = [base,*historical_bases]
+        if record['identity']['head'] == head:
+            accepted_bases.append(record['identity']['base_oid'])
+        attempted_base = refusal.get('attempted_base_oid') if isinstance(refusal,dict) else None
+        if (not isinstance(refusal, dict) or set(refusal) != required or refusal['provider'] != 'github'
+                or not repository or refusal['repository'] != repository or type(refusal['number']) is not int
+                or refusal['number'] != pr['number']
+                or refusal['head'] != head or refusal['target_branch'] != target
+                or not isinstance(attempted_base,str) or len(attempted_base) != len(head)
+                or re.fullmatch(r'[a-f0-9]+',attempted_base) is None or attempted_base not in accepted_bases
+                or not scoped_refusal(refusal['http_status'],refusal['message'])):
+            raise ReviewError('Provider refusal requires the actual bounded HTTP response and the original merge attempt scope')
+    files = workflow_diff(root, base, head)
+    prerequisite = None
+    if drift == 'moved' and files['paths']:
+        prerequisite = {'kind':'review-refresh-required','target_branch':target,'head':head,'base_oid':base,
+                        'actions':['inspect-current-provider-snapshot','review-current-head-and-base',
+                                   'rerun-required-checks','apply-existing-merge-gate']}
+    return {'pr':deepcopy(expected_pr),'authorization':deepcopy(record['authorization']),'head':head,
+            'target_branch':target,'base_oid':base,'reviewed_base_oid':previous,'base_drift':drift,
+            'workflow_diff':files,'provider_refusal':deepcopy(refusal),'credential_permissions':'unknown',
+            'prerequisite':prerequisite}
+
+
 class GitHub:
     """Authorized gh fallback; connectors can supply the same normalized snapshots."""
-    def __init__(self, root, repository, head_repository=None):
+    def __init__(self, root, repository, head_repository=None, *, host=None):
         self.root = Path(root)
         for name in (repository, head_repository or repository):
             if not isinstance(name, str) or not re.fullmatch(r'[\w.-]+/[\w.-]+', name):
@@ -707,16 +1295,28 @@ class GitHub:
         self.repository = repository.lower()
         self.head_repository = (head_repository or repository).lower()
         self.explicit_head = head_repository is not None
+        if host is not None and (not isinstance(host, str) or not re.fullmatch(r'[a-z0-9][a-z0-9.-]*', host)):
+            raise ReviewError('A verified GitHub hostname is required')
+        self.host = host
 
     @classmethod
-    def from_preflight(cls, root, checked):
+    def from_preflight(cls, root, checked, *, host=None):
         if not checked.get('base_repository') or not checked.get('head_repository'):
             raise ReviewError('Select the reviewed base and head remotes in publication preflight')
-        return cls(root, checked['base_repository'], checked['head_repository'])
+        return cls(root, checked['base_repository'], checked['head_repository'], host=host)
     def gh(self,*args):
+        if self.host and args[:1] == ('api',):
+            args = (*args, '--hostname', self.host)
         if '--paginate' in args and '--slurp' not in args:args=(*args,'--slurp')
         result=subprocess.run(['gh',*map(str,args)],cwd=self.root,capture_output=True,text=True,timeout=45)
-        if result.returncode:raise ReviewError('GitHub access or operation failed; preserve the publication checkpoint')
+        if result.returncode:
+            error = ReviewError('GitHub access or operation failed; preserve the publication checkpoint')
+            if (len(args) >= 4 and args[:3] == ('api','--method','PUT')
+                    and re.fullmatch(r'repos/[^/]+/[^/]+/pulls/\d+/merge', args[3])):
+                response = re.fullmatch(r'gh: (.{1,2048}) \(HTTP (4[0-9]{2})\)', result.stderr.strip())
+                if response and scoped_refusal(int(response[2]), response[1]):
+                    error.http_refusal = {'http_status':int(response[2]),'message':response[1]}
+            raise error
         data=json.loads(result.stdout) if result.stdout.strip() else None
         if '--slurp' in args and data and isinstance(data[0],list):return [item for page in data for item in page]
         return data
@@ -767,8 +1367,36 @@ class GitHub:
             if matches[0]['body']!=body+'\n\n'+marker:raise ReviewError('Existing comment marker has different content; reconcile before a new operation')
             return matches[0]
         return self.gh('api','--method','POST',endpoint,'-f','body='+body+'\n\n'+marker)
-    def snapshot(self,number,context,policy):
-        raw=self.gh('pr','view',number,'--repo',self.repository,'--json','id,number,url,state,headRefOid,headRefName,baseRefOid,baseRefName,mergeable,reviewDecision,mergeCommit,statusCheckRollup,changedFiles,isCrossRepository,headRepository,headRepositoryOwner')
+    def pull_view(self, number):
+        repo = self.host + '/' + self.repository if self.host else self.repository
+        return self.gh('pr','view',number,'--repo',repo,'--json',
+                       'id,number,url,state,headRefOid,headRefName,baseRefOid,baseRefName,mergeable,reviewDecision,mergeCommit,statusCheckRollup,changedFiles,isCrossRepository,headRepository,headRepositoryOwner')
+
+    def require_handoff_pull(self, raw, context, expected_pr, same_repository_required):
+        if not isinstance(raw, dict):
+            raise ReviewError('Provider PR inspection is unavailable')
+        fields = {'headRefOid': 'head', 'baseRefOid': 'base_oid',
+                  'headRefName': 'source_branch', 'baseRefName': 'target_branch'}
+        identity_url = 'https://' + self.host + '/' + self.repository + '/pull/' + str(expected_pr['number'])
+        owner = raw.get('headRepositoryOwner')
+        repository = raw.get('headRepository')
+        if not isinstance(owner, dict) or not isinstance(repository, dict):
+            raise ReviewError('Provider head repository evidence is unavailable')
+        owner_name, repository_name = owner.get('login'), repository.get('name')
+        if not isinstance(owner_name, str) or not isinstance(repository_name, str):
+            raise ReviewError('Provider head repository evidence is unavailable')
+        head = (owner_name + '/' + repository_name).lower()
+        if ({key: raw.get(key) for key in ('id', 'number', 'url')} != expected_pr
+                or type(raw.get('number')) is not int or raw['url'].lower() != identity_url
+                or raw.get('state') != 'OPEN' or any(raw.get(key) != context[value] for key, value in fields.items())
+                or head != self.head_repository
+                or (same_repository_required and raw.get('isCrossRepository') is not False)):
+            raise ProviderHandoffChanged('The original open GitHub PR, repository, head or target base changed')
+
+    def snapshot(self,number,context,policy,*,expected_pr=None,same_repository_required=False):
+        raw=self.pull_view(number)
+        if expected_pr is not None:
+            self.require_handoff_pull(raw, context, expected_pr, same_repository_required)
         if raw['headRefName']!=context['source_branch'] or raw['baseRefName']!=context['target_branch']:
             raise ReviewError('Provider PR branch identity differs from preflight')
         observed_owner = (raw.get('headRepositoryOwner') or {}).get('login', '')
@@ -782,31 +1410,64 @@ class GitHub:
             raise ReviewError('Provider PR source repository or selected commit identity differs from preflight')
         endpoint='repos/'+self.repository
         files=self.gh('api','--method','GET',endpoint+'/pulls/'+str(number)+'/files','--paginate')
-        if len(files)!=raw['changedFiles']:raise ReviewError('Provider full-diff file inventory is incomplete')
+        if (not isinstance(files, list) or any(not isinstance(row, dict) or not isinstance(row.get('filename'), str)
+                                                for row in files) or len(files)!=raw['changedFiles']):
+            raise ReviewError('Provider full-diff file inventory is incomplete')
         reviews=self.gh('api','--method','GET',endpoint+'/pulls/'+str(number)+'/reviews','--paginate')
         comments=self.gh('api','--method','GET',endpoint+'/issues/'+str(number)+'/comments','--paginate')
         inline=self.gh('api','--method','GET',endpoint+'/pulls/'+str(number)+'/comments','--paginate')
-        owner,name=self.repository.split('/');threads=[];cursor=None
+        if any(not isinstance(inventory, list) or any(not isinstance(row, dict) for row in inventory)
+               for inventory in (reviews, comments, inline)):
+            raise ReviewError('Provider review or comment inventory is incomplete')
+        owner,name=self.repository.split('/');threads=[];cursor=None;seen=set()
         query='query($owner:String!,$name:String!,$number:Int!,$cursor:String){repository(owner:$owner,name:$name){pullRequest(number:$number){reviewThreads(first:100,after:$cursor){nodes{id isResolved isOutdated path line} pageInfo{hasNextPage endCursor}}}}}'
+        if expected_pr is not None:
+            query=query.replace('{reviewThreads(', '{id reviewThreads(')
         while True:
             args=['api','graphql','-f','query='+query,'-f','owner='+owner,'-f','name='+name,'-F','number='+str(number)]
             if cursor:args+=['-f','cursor='+cursor]
             response=self.gh(*args)
-            if response.get('errors'):raise ReviewError('Provider discussion inventory is incomplete')
-            page=response['data']['repository']['pullRequest']['reviewThreads']
+            if not isinstance(response, dict) or response.get('errors'):
+                raise ReviewError('Provider discussion inventory is incomplete')
+            pull=response['data']['repository']['pullRequest']
+            if not isinstance(pull, dict):
+                raise ReviewError('Provider discussion inventory is incomplete')
+            if expected_pr is not None and pull.get('id')!=expected_pr['id']:
+                raise ProviderHandoffChanged('The provider discussion page identifies a different PR')
+            page=pull['reviewThreads']
             threads.extend({'id':t['id'],'resolved':t['isResolved'],'required':not t['isResolved'],'path':t['path'],'line':t['line'],'outdated':t['isOutdated']} for t in page['nodes'])
             if not page['pageInfo']['hasNextPage']:break
             new_cursor=page['pageInfo']['endCursor']
-            if not new_cursor or new_cursor==cursor:raise ReviewError('Provider discussion pagination did not advance')
+            if not isinstance(new_cursor, str) or not new_cursor or new_cursor in seen:
+                raise ReviewError('Provider discussion pagination did not advance')
+            seen.add(new_cursor)
             cursor=new_cursor
+        if expected_pr is not None:
+            raw = self.pull_view(number)
+            self.require_handoff_pull(raw, context, expected_pr, same_repository_required)
+            rollup = raw.get('statusCheckRollup')
+            if (not isinstance(rollup, list) or any(not isinstance(check, dict) for check in rollup)
+                    or 'reviewDecision' not in raw):
+                raise ReviewError('Provider check or approval inventory is unavailable')
+            if len(files)!=raw['changedFiles']:
+                raise ProviderHandoffChanged('The provider full-diff inventory changed during inspection')
         required=set(policy.get('required_check_names',[]));checks=[]
         for check in raw.get('statusCheckRollup') or []:
             name=check.get('name') or check.get('context');status=check.get('conclusion') or check.get('state') or check.get('status') or 'UNKNOWN'
+            if expected_pr is not None and (not isinstance(name, str) or not isinstance(status, str)):
+                raise ReviewError('Provider check identity or status is unavailable')
             checks.append({'name':name,'status':'success' if status=='SUCCESS' else status.lower(),'required':name in required})
         return {**context,'head':raw['headRefOid'],'base_oid':raw['baseRefOid'],'candidate_objects_required':True,'changed_files':[f['filename'] for f in files],'pr':{'id':raw['id'],'number':raw['number'],'url':raw['url']},'state':raw['state'],'merge_commit':(raw.get('mergeCommit') or {}).get('oid'),'mergeable':raw['mergeable'],'reviews':reviews,'comments':comments+inline,'threads':threads,'checks':checks,'checks_known':policy.get('checks_known') is True,'required_checks_missing':sorted(required-{c['name'] for c in checks}),'approvals_known':policy.get('approvals_known') is True,'approvals_required':policy.get('approvals_required',True),'approved':raw.get('reviewDecision')=='APPROVED','same_repository':raw.get('isCrossRepository') is False}
     def merge(self,number,head,method):
         if method not in {'merge','squash','rebase'}:raise ReviewError('Repository-approved merge method required')
-        return self.gh('api','--method','PUT','repos/'+self.repository+'/pulls/'+str(number)+'/merge','-f','sha='+head,'-f','merge_method='+method)
+        try:
+            return self.gh('api','--method','PUT','repos/'+self.repository+'/pulls/'+str(number)+'/merge',
+                           '-f','sha='+head,'-f','merge_method='+method)
+        except ReviewError as error:
+            if hasattr(error,'http_refusal'):
+                error.provider_refusal = {'provider':'github','repository':self.repository,'number':number,
+                                          'head':head,**error.http_refusal}
+            raise
 
 def new_record(snapshot,params):
     if not params['authorization'].get('pr'):raise ReviewError('Publication requires the direct owner invocation')
@@ -837,6 +1498,184 @@ def registered_target(root, ref):
     return matches[0] if matches else None
 
 
+def _profile_path(root, relative):
+    path = Path(relative)
+    if (path.is_absolute() or path.as_posix() != relative or not path.parts
+            or '..' in path.parts or '\\' in relative or '\0' in relative):
+        raise ValueError('An owned profile input requires an exact repository-relative path')
+    full = root / path
+    if full.resolve() != full:
+        raise ValueError('Owned profile inputs cannot follow symbolic links')
+    return full
+
+
+def _regular_input(full, label, limit=None):
+    try:
+        descriptor = os.open(full, os.O_RDONLY | getattr(os,'O_NOFOLLOW',0) | getattr(os,'O_NONBLOCK',0))
+    except FileNotFoundError:
+        return None
+    with os.fdopen(descriptor, 'rb') as source:
+        if not stat.S_ISREG(os.fstat(source.fileno()).st_mode):
+            raise ValueError(label+' require regular files')
+        content = source.read() if limit is None else source.read(limit+1)
+        if limit is not None and len(content) > limit:
+            raise ValueError(label+' exceed the read limit')
+        return content
+
+
+def _profile_input(root, relative):
+    return _regular_input(_profile_path(root,relative),'Owned profile inputs')
+
+
+def _profile_discovery_paths(root, rules):
+    names = set(rules['names'])
+    extensions = set(rules['extensions'])
+    excluded = {'node_modules', '.git', 'Library', 'Temp', 'artifacts', 'installation'}
+    found = {name for name in names if _profile_path(root, name).exists()}
+    for relative in rules['roots']:
+        start = _profile_path(root, relative)
+        if not start.exists():
+            continue
+        if not start.is_dir():
+            raise ValueError('Profile inventory roots require directories')
+        for directory, directories, files in os.walk(start, followlinks=False):
+            directories[:] = [name for name in directories if name not in excluded]
+            for name in directories + files:
+                path = Path(directory) / name
+                if path.is_symlink() and name not in excluded:
+                    raise ValueError('The profile inventory contains a symbolic link')
+            for name in files:
+                if name not in excluded and (name in names or Path(name).suffix in extensions):
+                    found.add((Path(directory) / name).relative_to(root).as_posix())
+    return found
+
+
+def _owned_profile_files_match(root, relative, files):
+    destination = _profile_path(root, relative)
+    if not destination.is_dir() or not isinstance(files, dict) or not files:
+        return False
+    actual = set()
+    for directory, directories, names in os.walk(destination, followlinks=False):
+        parent = Path(directory)
+        prefix = parent.relative_to(destination).as_posix()
+        if prefix != 'plugins' and not prefix.startswith('plugins/'):
+            directories[:] = [name for name in directories if name != '__pycache__']
+            names = [name for name in names if name != '__pycache__']
+        if any((parent / name).is_symlink() for name in directories):
+            return False
+        for name in names:
+            actual.add((parent / name).relative_to(destination).as_posix())
+    if actual != files.keys():
+        return False
+    for name, expected in files.items():
+        source = _profile_input(root, relative + '/' + name)
+        if source is None or hashlib.sha256(source).hexdigest() != expected:
+            return False
+    return True
+
+
+def _owned_profile_destinations_match(root, destinations):
+    if not isinstance(destinations, dict) or not destinations:
+        return False
+    for relative, record in destinations.items():
+        files = record.get('files') if isinstance(record, dict) else None
+        name = record.get('name', '') if isinstance(record, dict) else ''
+        if (not isinstance(name, str) or not re.fullmatch(r'skill-tree-[a-z0-9-]+', name)
+                or Path(relative).name != name or not _owned_profile_files_match(root, relative, files)):
+            return False
+    return True
+
+
+def _owned_profile_bridges_match(root, bridges):
+    if not isinstance(bridges, dict):
+        return False
+    begin = '<!-- BEGIN skill-tree-skills -->'
+    end = '<!-- END skill-tree-skills -->'
+    for relative, record in bridges.items():
+        raw = _profile_input(root, relative)
+        if raw is None or not isinstance(record, dict):
+            return False
+        contents = raw.decode('utf-8', errors='replace')
+        start = contents.find(begin)
+        stop = contents.find(end)
+        if (start < 0 or stop < start or contents.find(begin, start + len(begin)) >= 0
+                or contents.find(end, stop + len(end)) >= 0):
+            return False
+        block = contents[start:stop + len(end)]
+        if hashlib.sha256(block.encode('utf-8')).hexdigest() != record.get('hash'):
+            return False
+    return True
+
+
+def canonical_profile_prerequisite(root):
+    """Report owned discovery input drift without executing target code."""
+    root = Path(root).resolve()
+    profile_path = '.skill-tree/installation/profile.json'
+    manager_path = '.skill-tree/installation/manager.js'
+    bundle_source = '.skill-tree/installation/source'
+    capability_path = bundle_source + '/config/capabilities.json'
+    try:
+        raw = _profile_input(root, profile_path)
+        if raw is None:
+            return None
+        profile = json.loads(raw)
+        if (not isinstance(profile, dict) or profile.get('format') != 'skill-tree-profile'
+                or profile.get('schema') != 1 or profile.get('project_root') != str(root)
+                or not isinstance(profile.get('inputs'), dict)
+                or not isinstance(profile.get('bundle_digests'), dict)):
+            return None
+        bundle = profile['bundle_digests']
+        if manager_path not in bundle or capability_path not in bundle:
+            return None
+        prefix = bundle_source + '/'
+        bundle_files = {relative[len(prefix):]: expected for relative, expected in bundle.items()
+                        if relative.startswith(prefix)}
+        if not _owned_profile_files_match(root, bundle_source, bundle_files):
+            return None
+        for relative in bundle.keys() - {prefix + name for name in bundle_files}:
+            source = _profile_input(root, relative)
+            if source is None or hashlib.sha256(source).hexdigest() != bundle[relative]:
+                return None
+        capabilities = json.loads(_profile_input(root, capability_path))
+        discovered = _profile_discovery_paths(root, capabilities['inventory'])
+        inputs = profile['inputs']
+        changed = []
+        for relative in inputs.keys() | discovered:
+            expected = inputs.get(relative)
+            if expected is not None and (not isinstance(expected, str) or not re.fullmatch('[a-f0-9]{64}', expected)):
+                return None
+            source = _profile_input(root, relative)
+            actual = hashlib.sha256(source).hexdigest() if source is not None else None
+            if actual != expected:
+                changed.append(relative)
+        if (not changed or not _owned_profile_destinations_match(root, profile.get('destinations'))
+                or not _owned_profile_bridges_match(root, profile.get('bridges', {}))
+                or _profile_input(root, profile_path) != raw):
+            return None
+        return {'code': 'profile-refresh-required', 'changed_inputs': sorted(changed),
+                'profile_sha256': hashlib.sha256(raw).hexdigest(),
+                'recovery_argv': ['node', manager_path, '--refresh-profile']}
+    except (OSError, TypeError, KeyError, ValueError, subprocess.TimeoutExpired):
+        return None
+
+
+def synchronized_profile_prerequisite(root, ref, expected_head):
+    try:
+        target = registered_target(root, ref)
+        if target is None or ws.common_dir(target) != ws.common_dir(root):
+            return None
+        checkout = ws.checked_out_branch(target)
+        if (checkout['ref'], checkout['head']) != (ref, expected_head):
+            return None
+        prerequisite = canonical_profile_prerequisite(target)
+        if prerequisite and ws.checked_out_branch(target) == checkout:
+            return {**prerequisite, 'target_ref': ref, 'target_head': expected_head,
+                    'target_checkout': checkout['checkout']}
+    except (OSError, ValueError, subprocess.TimeoutExpired):
+        return None
+    return None
+
+
 def fast_forward_checked_out_target(root, worktree, checkout, tracking, remote_head):
     # The protected ref update needs a different Git HEAD from the target.
     preparation = {
@@ -848,18 +1687,32 @@ def fast_forward_checked_out_target(root, worktree, checkout, tracking, remote_h
     if root != worktree:
         ws.run_local_merge(worktree, root, preparation, fast_forward=True)
         return
+    ws.local_git_policy(worktree, signed=True, fast_forward=True)
     with tempfile.TemporaryDirectory(prefix='skill-tree-pr-target-') as temporary:
-        writer = Path(temporary).resolve() / 'ref-writer'
-        ws.local_git(root, 'worktree', 'add', '--detach', '--no-checkout', '--', writer, remote_head)
+        scratch = Path(temporary).resolve()
+        writer = scratch / 'ref-writer'
+        hooks = scratch / 'hooks'
+        hooks.mkdir()
+        no_hooks = ('-c', f'core.hooksPath={hooks}')
+        ws.local_git(root, *no_hooks, 'worktree', 'add', '--detach', '--no-checkout', '--', writer, remote_head)
         initialized = False
         try:
-            ws.local_git(writer, 'read-tree', '--reset', '-u', remote_head)
+            ws.local_git(writer, *no_hooks, 'read-tree', '--reset', '-u', remote_head)
             initialized = True
             ws.run_local_merge(worktree, writer, preparation, fast_forward=True)
         finally:
             # The incomplete checkout exists only inside private scratch space.
             options = () if initialized else ('--force',)
-            ws.local_git(root, 'worktree', 'remove', *options, '--', writer)
+            ws.local_git(root, *no_hooks, 'worktree', 'remove', *options, '--', writer)
+
+
+def fetch_synchronization_ref(root, remote, refspec):
+    ws.require_local_git_hooks(root, ('reference-transaction',))
+    fetch = ws.local_git if remote == '.' else ws.git
+    with tempfile.TemporaryDirectory(prefix='skill-tree-fetch-hooks-') as hooks:
+        fetch(root, 'fetch', '--no-tags', '--no-recurse-submodules', '--no-write-fetch-head',
+              '--no-auto-maintenance', '--refmap=', '--', remote, refspec,
+              git_options=('-c', f'core.hooksPath={hooks}'))
 
 
 def fast_forward_local_target(root, ref, local_head, tracking, remote_head):
@@ -872,10 +1725,8 @@ def fast_forward_local_target(root, ref, local_head, tracking, remote_head):
         return
     # Git refuses a local fetch into a branch checked out in any worktree.
     # A non-forced exact refspec also protects any intervening local commits.
-    ws.local_git_policy(root, merge=False, signed=True)
     try:
-        ws.local_git(root, 'fetch', '--no-tags', '--no-recurse-submodules', '--no-write-fetch-head',
-                     '--refmap=', '--', '.', remote_head + ':' + ref)
+        fetch_synchronization_ref(root, '.', remote_head + ':' + ref)
     except ws.RunError:
         if registered_target(root, ref) is not None:
             raise ReviewError('The target was checked out during synchronization') from None
@@ -902,8 +1753,7 @@ def synchronize_local_target(root, record):
             ws.local_git(root, 'check-ref-format', name)
             if ws.local_git(root, 'symbolic-ref', '--quiet', '--no-recurse', name, accepted=(0, 1)).returncode == 0:
                 raise ReviewError('The exact target or tracking ref is symbolic')
-        ws.git(root, 'fetch', '--no-tags', '--no-recurse-submodules', '--no-write-fetch-head', '--refmap=', '--',
-               remote, '+' + ref + ':' + tracking)
+        fetch_synchronization_ref(root, remote, '+' + ref + ':' + tracking)
         remote_head = ws.local_git_text(root, 'rev-parse', '--verify', tracking + '^{commit}')
         receipt['remote_head'] = remote_head
         if ws.local_git(root, 'merge-base', '--is-ancestor', integration, remote_head, accepted=(0, 1, 128)).returncode:
@@ -912,22 +1762,197 @@ def synchronize_local_target(root, record):
         present = ws.local_git(root, 'show-ref', '--verify', '--quiet', ref, accepted=(0, 1)).returncode == 0
         local_head = ws.local_git_text(root, 'rev-parse', '--verify', ref + '^{commit}') if present else None
         receipt['local_head'] = local_head
-        if local_head and ws.local_git(root, 'merge-base', '--is-ancestor', remote_head, local_head, accepted=(0, 1)).returncode == 0:
-            receipt['status'] = 'synchronized'
-            return receipt
-        if local_head and ws.local_git(root, 'merge-base', '--is-ancestor', local_head, remote_head, accepted=(0, 1)).returncode:
-            raise ReviewError('Local and remote targets diverged and require a reviewed local integration')
-
-        fast_forward_local_target(root, ref, local_head, tracking, remote_head)
-        receipt['local_head'] = ws.local_git_text(root, 'rev-parse', '--verify', ref + '^{commit}')
-        if ws.local_git(root, 'merge-base', '--is-ancestor', remote_head, receipt['local_head'], accepted=(0, 1)).returncode:
-            raise ReviewError('Verify that the local target contains the fetched target after updating')
+        if not local_head or ws.local_git(root, 'merge-base', '--is-ancestor', remote_head, local_head, accepted=(0, 1)).returncode:
+            if local_head and ws.local_git(root, 'merge-base', '--is-ancestor', local_head, remote_head, accepted=(0, 1)).returncode:
+                raise ReviewError('Local and remote targets diverged and require a reviewed local integration')
+            fast_forward_local_target(root, ref, local_head, tracking, remote_head)
+            receipt['local_head'] = ws.local_git_text(root, 'rev-parse', '--verify', ref + '^{commit}')
+            if ws.local_git(root, 'merge-base', '--is-ancestor', remote_head, receipt['local_head'], accepted=(0, 1)).returncode:
+                raise ReviewError('Verify that the local target contains the fetched target after updating')
+            if local_head:
+                receipt['previous_local_head'] = local_head
+        prior = record.get('local_target_sync', {})
+        if (prior.get('status') == 'synchronized' and prior.get('remote_head') == remote_head
+                and prior.get('local_head') == receipt['local_head'] and prior.get('previous_local_head')):
+            receipt.setdefault('previous_local_head', prior['previous_local_head'])
         receipt['status'] = 'synchronized'
+        prerequisite = synchronized_profile_prerequisite(root, ref, receipt['local_head'])
+        if prerequisite:
+            receipt['profile_prerequisite'] = prerequisite
     except (ReviewError, ws.RunError) as error:
         receipt['reason'] = str(error)
     except (OSError, UnicodeError, subprocess.TimeoutExpired):
         receipt['reason'] = 'The local target Git operation was unavailable or timed out'
     return receipt
+
+
+def _profile_maintenance_library():
+    # Resolve the executing generation without using product or target Git content as code.
+    script = Path(__file__).resolve()
+    core = script.parents[2]
+    if script.parent == core / 'common/scripts':
+        library = _profile_path(core, 'lib/installation.js')
+        if library.is_file():
+            return library
+    package = script.parent.parent
+    bundle = '.skill-tree/installation/source'
+    for actor_root in package.parents:
+        raw = _profile_input(actor_root, '.skill-tree/installation/profile.json')
+        if raw is None:
+            continue
+        profile = json.loads(raw)
+        destination = package.relative_to(actor_root).as_posix()
+        owned = profile.get('destinations', {}).get(destination, {}).get('files', {})
+        if (profile.get('project_root') != str(actor_root)
+                or owned.get('scripts/pr-review-state.py') != hashlib.sha256(script.read_bytes()).hexdigest()):
+            continue
+        prefix = bundle + '/'
+        files = {relative[len(prefix):]: expected for relative, expected in profile.get('bundle_digests', {}).items()
+                 if relative.startswith(prefix)}
+        if 'lib/installation.js' in files and _owned_profile_files_match(actor_root, bundle, files):
+            return _profile_path(actor_root, bundle + '/lib/installation.js')
+    raise ReviewError('The trusted acting installation library is unavailable')
+
+
+def _operate_delivery_profile(library, target, request):
+    script = """
+const [library,root]=process.argv.slice(1);
+try {
+  const request=JSON.parse(require('node:fs').readFileSync(0,'utf8'));
+  const result=require(library).maintainDeliveredProfile(root,request);
+  console.log(JSON.stringify(result));
+} catch (error) {
+  console.log(JSON.stringify({error:error.message}));
+  process.exitCode=2;
+}
+"""
+    environment = ws.local_git_environment()
+    environment.pop('NODE_OPTIONS', None)
+    environment.pop('NODE_PATH', None)
+    output = subprocess.run(['node', '-e', script, str(library), str(target)], cwd=library.parent,
+                            input=json.dumps(request), capture_output=True, text=True,
+                            env=environment, timeout=45)
+    try:
+        result = json.loads(output.stdout)
+    except ValueError as error:
+        raise ReviewError('The trusted profile maintenance operation returned no structured result') from error
+    if output.returncode:
+        raise ReviewError(result.get('error') or 'The trusted profile maintenance operation failed')
+    return result
+
+
+def restore_delivery_profile(root, store, key, authorization):
+    relative = '.skill-tree/history/publications/pub-' + key + '.json'
+    carrier = store.owned(relative)
+    original = carrier.read_bytes()
+    record = json.loads(original)
+    identity = record['identity']
+    with ws.publication_lock(root, identity['remote'], identity['target_branch']):
+        if carrier.read_bytes() != original:
+            raise ReviewError('The selected publication changed before profile maintenance')
+        sync = record.get('local_target_sync', {})
+        if (record.get('status') != 'merged' or sync.get('status') != 'synchronized'
+                or sync.get('merge_commit') != record.get('merge_commit')
+                or sync.get('target_branch') != identity['target_branch'] or sync.get('remote') != identity['remote']):
+            raise ReviewError('Profile maintenance requires an exact verified PR delivery')
+        ref = 'refs/heads/' + identity['target_branch']
+        tracking = 'refs/remotes/' + identity['remote'] + '/' + identity['target_branch']
+        head = sync['local_head']
+        previous = record.get('profile_maintenance')
+        if authorization is None and previous:
+            authorization = previous['authorization']
+        if not isinstance(authorization, dict):
+            raise ReviewError('Profile maintenance requires a bounded explicit owner instruction')
+        base = {'origin': 'owner', 'permission': 'refresh-compatible-profile', 'publication_id': key,
+                'repo_id': identity['repo_id'], 'merge_commit': record['merge_commit'],
+                'target_ref': ref, 'target_head': head}
+        if (authorization.keys() != base.keys() | {'target_checkout', 'profile_sha256'}
+                or any(authorization.get(name) != value for name, value in base.items())
+                or any(not isinstance(authorization.get(name), str)
+                       or not re.fullmatch('[a-f0-9]{64}', authorization[name])
+                       for name in ('target_checkout', 'profile_sha256'))):
+            raise ReviewError('Profile maintenance authorization differs from the exact verified delivery')
+        if previous and previous.get('authorization') != authorization:
+            record.setdefault('profile_maintenance_history', []).append(previous)
+            previous = None
+        if previous is None:
+            prerequisite = sync.get('profile_prerequisite', {})
+            if any(prerequisite.get(name) != authorization[name] for name in
+                   ('target_ref', 'target_head', 'target_checkout', 'profile_sha256')):
+                raise ReviewError('Profile maintenance requires the exact observed profile prerequisite')
+
+        maintenance = deepcopy(previous) if previous is not None else {'authorization': authorization}
+        record['profile_maintenance'] = maintenance
+        record['order_completed'] = publication_complete(record)
+        def save(*, final=False):
+            nonlocal original
+            with store.lock():
+                if carrier.read_bytes() != original:
+                    raise ReviewError('The publication carrier changed during profile maintenance')
+                rendered = json.dumps(record, sort_keys=True, indent=2) + '\n'
+                state = store.load() if final and store.state.is_file() and store.future.is_file() else None
+                runs = ((state or {}).get('run_registry') or {}).get('runs', {})
+                matching = [run for run in runs.values()
+                            if run.get('delivery', {}).get('publication') == relative
+                            and run.get('workspace', {}).get('branch') == identity['source_branch']]
+                if len(matching) > 1:
+                    raise ReviewError('The publication run identity changed before profile maintenance recording')
+                if matching:
+                    matching[0]['delivery'].update(local_target_sync=sync, profile_maintenance=maintenance)
+                    store.save(store.text(), state, extras={relative: rendered})
+                else:
+                    store.commit({relative: rendered})
+                original = rendered.encode()
+
+        try:
+            remote = ws.local_git_text(root, 'remote', 'get-url', '--', identity['remote'])
+            if (hashlib.sha256(remote.encode()).hexdigest() != identity['remote_id']
+                    or ws.repo_id(root) != identity['repo_id'] or head != sync['remote_head']
+                    or not sync.get('previous_local_head')):
+                raise ReviewError('Original synchronized target or pre-sync input provenance is unavailable')
+            target = registered_target(root, ref)
+            if target != ws.canonical(root) or ws.common_dir(target) != ws.common_dir(root):
+                raise ReviewError('Profile maintenance requires the recorded canonical checkout')
+            library = _profile_maintenance_library()
+            checkout = {'ref': ref, 'head': head, 'checkout': authorization['target_checkout']}
+            request = {**authorization, 'previous_local_head': sync['previous_local_head']}
+            profile_path = '.skill-tree/installation/profile.json'
+            with tempfile.TemporaryDirectory(prefix='skill-tree-profile-ref-') as hooks:
+                with ws.local_ref_transaction(target, hooks, tracking, head, ref, head, head):
+                    if ws.checked_out_branch(target) != checkout:
+                        raise ReviewError('The authorized target checkout changed before maintenance')
+                    raw = _profile_input(target, profile_path)
+                    actual = hashlib.sha256(raw).hexdigest() if raw else None
+                    plan = maintenance.get('plan')
+                    if plan is not None and actual == plan['after']['profile_sha256']:
+                        restored = _operate_delivery_profile(library, target, {**request, 'phase': 'verify', 'plan': plan})
+                        status = 'restored' if maintenance.get('status') == 'restored' else 'reconciled'
+                    else:
+                        if actual != authorization['profile_sha256']:
+                            raise ReviewError('The current profile differs from both exact maintenance generations')
+                        derived = _operate_delivery_profile(library, target, {**request, 'phase': 'prepare'})
+                        if plan is not None and derived['plan'] != plan:
+                            raise ReviewError('Retained profile maintenance intent differs from current evidence')
+                        plan = derived['plan']
+                        maintenance.update(status='prepared', plan=plan)
+                        maintenance.pop('reason', None)
+                        save()
+                        _operate_delivery_profile(library, target, {**request, 'phase': 'activate', 'plan': plan})
+                        restored = _operate_delivery_profile(library, target, {**request, 'phase': 'verify', 'plan': plan})
+                        status = 'restored'
+                    raw = _profile_input(target, profile_path)
+                    if (ws.checked_out_branch(target) != checkout or restored['profile'] != plan['after']
+                            or raw is None or hashlib.sha256(raw).hexdigest() != plan['after']['profile_sha256']):
+                        raise ReviewError('The exact target or anticipated installation changed before receipt recording')
+                    maintenance['status'] = status
+                    maintenance.pop('reason', None)
+                    sync.pop('profile_prerequisite', None)
+                    save(final=True)
+                    return record
+        except (ReviewError, ws.RunError, OSError, subprocess.TimeoutExpired) as error:
+            maintenance.update(status='retryable', reason=str(error))
+        save(final=True)
+        return record
 
 
 def publication_complete(record):
@@ -937,25 +1962,82 @@ def publication_complete(record):
 
 def main(argv=None):
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('command',choices=['parameters','preflight','init','observe','review','ready','merge-gate','operation','block','hook-attach','inspection','review-reconcile','plugin-findings'])
+    parser.add_argument('command',choices=['parameters','preflight','prepare-handoff','init','observe','review','ready','merge-gate','merge-denial-preview','operation','block','hook-attach','inspection','review-reconcile','plugin-findings','profile-maintenance','final-validation'])
     parser.add_argument('root',type=Path);parser.add_argument('--input',type=Path,required=True);parser.add_argument('--publication-id')
     args=parser.parse_args(argv)
+    if args.command in {'final-validation', 'prepare-handoff'}:
+        with offline_candidate_git():
+            return dispatch(args)
+    return dispatch(args)
+
+
+def dispatch(args):
     try:
         payload=json.loads(args.input.read_text());root=args.root.resolve()
+        if not isinstance(payload,dict):raise ReviewError('Publication requests require an object')
+        explicit_source = 'source_checkout' in payload
+        if explicit_source and args.command != 'prepare-handoff' and (not args.publication_id
+                or args.command in {'parameters','profile-maintenance','init','operation','review-reconcile'}):
+            raise ReviewError('A source checkout selection applies to an existing exact review publication')
+        if explicit_source and {'package_root','run_overrides'} & payload.keys():
+            raise ReviewError('An isolated review keeps the original package and overrides')
         if args.command=='parameters':result=parameters(payload.get('current_branch',ws.git(root,'symbolic-ref','--short','HEAD')),payload)
-        elif args.command=='preflight':result=preflight(root,payload)
+        elif args.command=='preflight':
+            result=existing_source_preflight(root,payload,args.publication_id) if explicit_source else preflight(root,payload)
+        elif args.command=='prepare-handoff':
+            result=prepare_handoff(root,payload,args.publication_id)
+        elif args.command=='merge-denial-preview':
+            carrier = _review_path(SimpleNamespace(root=ws.canonical(root)),args.publication_id)
+            raw = _regular_input(carrier,'Publication receipts',16*1024*1024)
+            if raw is None:
+                raise ReviewError('Merge denial preview requires the exact retained publication')
+            observed_hash = hashlib.sha256(raw).hexdigest()
+            if payload.get('expected_publication_sha256',observed_hash) != observed_hash:
+                raise ReviewError('The selected publication changed before merge denial preview')
+            record = json.loads(raw)
+            if not isinstance(record,dict) or record.get('publication_id') != args.publication_id:
+                raise ReviewError('Merge denial preview requires the exact retained publication')
+            result = merge_denial_preview(root,record,payload)
+            if _regular_input(carrier,'Publication receipts',16*1024*1024) != raw:
+                raise ReviewError('The selected publication changed during merge denial preview')
+            result.update(publication_id=args.publication_id,publication_sha256=observed_hash)
+        elif args.command=='profile-maintenance':
+            key = args.publication_id
+            if not key or not re.fullmatch(r'[a-f0-9]{32}', key):
+                raise ReviewError('Profile maintenance requires the existing exact publication ID')
+            wf = owned_module('pr_workflow', Path(__file__).with_name('workflow-state.py'))
+            result = restore_delivery_profile(root, wf.Store(root, allow_unselected=True), key,
+                                              payload.get('profile_authorization'))
         else:
             # Metadata-only commands never send provider requests. The agent supplies inspected snapshots.
             canonical=ws.canonical(root);snapshot=payload.get('snapshot',{})
             key=args.publication_id or digest({**repository_scope(snapshot), **{k:snapshot[k] for k in ['repo_id','remote','source_branch','target_branch']}})[:32]
             if not re.fullmatch(r'[a-f0-9]{32}',key):raise ReviewError('Invalid publication ID')
             wf=owned_module('pr_workflow',Path(__file__).with_name('workflow-state.py'))
-            store=wf.Store(root,allow_unselected=True)
+            store = (wf.Store(canonical,allow_unselected=True,neutral=True) if explicit_source
+                     else wf.Store(root,allow_unselected=True))
+            cleanup_run_id = None
+            source_checkout = None
             with ws.publication_lock(root,snapshot.get('remote','origin'),snapshot.get('target_branch',key)):
-                carrier=canonical/('.skill-tree/history/publications/pub-'+key+'.json');carrier_hash=hashlib.sha256(carrier.read_bytes()).hexdigest() if carrier.exists() else None
+                carrier=_review_path(store,key)
+                carrier_hash=hashlib.sha256(carrier.read_bytes()).hexdigest() if carrier.exists() else None
+                if args.command == 'observe' and explicit_source and 'expected_publication_sha256' in payload:
+                    expected = payload['expected_publication_sha256']
+                    if (not isinstance(expected, str) or not re.fullmatch(r'[a-f0-9]{64}', expected)
+                            or expected != carrier_hash):
+                        raise ReviewError('The publication changed after handoff preparation')
                 original=json.loads(carrier.read_text()) if carrier.exists() else None
-                overrides=payload.get('run_overrides',(original or {}).get('review_requirements',{}).get('configuration',{}).get('run_overrides',{}))
-                prepared_review=review_requirement_plan(store,snapshot,record=original,package_root=payload.get('package_root'),run_overrides=overrides,publication_id=key)
+                if explicit_source:
+                    source_checkout=existing_source_checkout(store,payload['source_checkout'],original,key,snapshot)
+                    verified_files=existing_source_files(source_checkout,original['identity'])
+                    if set(snapshot.get('changed_files',[])) != set(verified_files):
+                        raise ReviewError('Current provider diff differs from the verified source checkout')
+                    store.source_root=Path(source_checkout['path'])
+                if explicit_source:
+                    prepared_review=isolated_review_requirements(store,snapshot,original,key,wf)
+                else:
+                    overrides=payload.get('run_overrides',(original or {}).get('review_requirements',{}).get('configuration',{}).get('run_overrides',{}))
+                    prepared_review=review_requirement_plan(store,snapshot,record=original,package_root=payload.get('package_root'),run_overrides=overrides,publication_id=key)
                 store._review_requirement_preflight=prepared_review
                 if args.command in {'ready','merge-gate'}:
                     prior=canonical/('.skill-tree/history/publications/pub-'+key+'.json')
@@ -966,6 +2048,11 @@ def main(argv=None):
                     relative='.skill-tree/history/publications/pub-'+key+'.json';path=canonical/relative
                     record=json.loads(path.read_text()) if path.exists() else None
                     if (hashlib.sha256(path.read_bytes()).hexdigest() if path.exists() else None)!=carrier_hash:raise ReviewError('The inspected publication carrier changed before the writer')
+                    if explicit_source:
+                        if existing_source_checkout(store,payload['source_checkout'],record,key,snapshot)!=source_checkout:
+                            raise ReviewError('The selected PR source worktree changed before the review writer')
+                        if prepared_review is None:
+                            isolated_review_requirements(store,snapshot,record,key,wf)
                     if prepared_review:wf._hook_watch_guard(prepared_review['watch'],prepared_review['package_root'])
                     record=_retire_review_hook_references(store,record,snapshot)
                     if args.command=='init':
@@ -974,6 +2061,10 @@ def main(argv=None):
                         retarget=bool(record and record['identity']['target_branch']!=snapshot['target_branch'])
                         result=reconcile(record,snapshot,retarget=params if args.publication_id else None) if record else new_record(snapshot,params)
                         result['publication_id']=key
+                        if 'final_validation' in payload:
+                            if not params['authorization'].get('pr'):
+                                raise ReviewError('Declaring final validation requires the direct publication invocation')
+                            declare_final_validation(store, result, snapshot, payload['final_validation'], existing=record is not None)
                         if not record and snapshot.get('state') in {'MERGED', 'CLOSED'}:
                             result = reconcile(result, snapshot)
                         if prepared_review and 'review_requirements' not in result:result['review_requirements']=_frozen_review_requirements(store,prepared_review)
@@ -988,6 +2079,7 @@ def main(argv=None):
                         elif args.command=='review-reconcile':result=reconcile_review_requirements(store,record,snapshot,key,prepared_review,payload['decision_receipt'])
                         elif args.command=='plugin-findings':result=incorporate_review_findings(store,record,snapshot,key,payload)
                         elif args.command=='hook-attach':result=attach_hook_chain(store,record,snapshot,payload['chain_id'])
+                        elif args.command=='final-validation':result=final_validation_transition(store,record,snapshot,payload.get('final_validation'))
                         elif args.command=='ready':result=ready(record,snapshot,store=store)
                         elif args.command=='merge-gate':result=merge_gate(record,snapshot,store=store)
                         elif args.command=='block':
@@ -1000,36 +2092,84 @@ def main(argv=None):
                     result['local_target_sync'] = synchronize_local_target(root, result)
                 if 'local_target_sync' in result:
                     result['order_completed'] = publication_complete(result)
+                grant = payload.get('profile_authorization')
+                retained = result.get('profile_maintenance', {})
+                automatic_profile = (observed_integration and args.command in {'init', 'observe'}
+                                     and result['order_completed']
+                                     and (grant is not None or
+                                          (retained.get('status') in {'prepared', 'retryable'} and
+                                           retained.get('authorization', {}).get('target_head')
+                                           == result['local_target_sync']['local_head'])))
                 with store.lock():
                     current_hash = hashlib.sha256(path.read_bytes()).hexdigest() if path.exists() else None
                     if current_hash != carrier_hash:
                         raise ReviewError('The inspected publication carrier changed before recording the result')
+                    if explicit_source:
+                        if existing_source_checkout(store,payload['source_checkout'],record,key,snapshot)!=source_checkout:
+                            raise ReviewError('The selected PR source worktree changed before recording the result')
+                        if prepared_review is None:
+                            isolated_review_requirements(store,snapshot,record,key,wf)
                     if prepared_review:wf._hook_watch_guard(prepared_review['watch'],prepared_review['package_root'])
-                    store.commit({relative:json.dumps(result,sort_keys=True,indent=2)+'\n'})
-                    if store.state.exists():
-                        state=store.load();registry=state.get('run_registry')
-                        matches=[r for r in registry['runs'].values() if r.get('workspace',{}).get('branch')==result['identity']['source_branch']] if registry else []
-                        if len(matches)>1:raise ReviewError('Publication run identity is ambiguous')
-                        if matches:
-                            run=matches[0];run.setdefault('delivery',{})['publication']=relative
-                            delivery = run['delivery']
-                            delivery['status'] = result['status']
-                            delivery['authorization'] = result['authorization']
-                            if 'local_target_sync' in result:
-                                delivery['local_target_sync'] = result['local_target_sync']
-                                if result['status'] == 'merged' and not result['order_completed']:
-                                    delivery['status'] = 'local-target-sync-pending'
-                            if result['status'] != 'merged' or 'local_target_sync' in result:
-                                delivery['order_completed'] = publication_complete(result)
-                            run['delivery']['pr']=result.get('pr');run['delivery']['merge_commit']=result.get('merge_commit')
+                    state=store.load() if store.state.exists() else None
+                    registry=(state or {}).get('run_registry') or {}
+                    matches=[r for r in registry.get('runs',{}).values()
+                             if r.get('workspace',{}).get('branch')==result['identity']['source_branch']
+                             and (not explicit_source or r.get('delivery',{}).get('publication')==relative)]
+                    if len(matches)>1:raise ReviewError('Publication run identity is ambiguous')
+                    carrier_write={relative:json.dumps(result,sort_keys=True,indent=2)+'\n'}
+                    if not explicit_source or not matches:
+                        store.commit(carrier_write)
+                    if matches:
+                        run=matches[0];run.setdefault('delivery',{})['publication']=relative
+                        delivery = run['delivery']
+                        delivery['status'] = result['status']
+                        delivery['authorization'] = result['authorization']
+                        if 'local_target_sync' in result:
+                            delivery['local_target_sync'] = result['local_target_sync']
+                            if 'profile_maintenance' in result:
+                                delivery['profile_maintenance'] = result['profile_maintenance']
+                            else:
+                                delivery.pop('profile_maintenance', None)
+                            if result['status'] == 'merged' and not result['order_completed']:
+                                delivery['status'] = 'local-target-sync-pending'
+                        if result['status'] != 'merged' or 'local_target_sync' in result:
+                            delivery['order_completed'] = publication_complete(result)
+                        run['delivery']['pr']=result.get('pr');run['delivery']['merge_commit']=result.get('merge_commit')
+                        if explicit_source:
+                            store.save(store.text(),state,extras=carrier_write,update_navigation=False)
+                        else:
                             store.save(store.text(),state)
-                            if observed_integration:
-                                if result['order_completed']:
-                                    result['worktree_cleanup'] = wf.cleanup_after_merge(store, state, run)
+                        if observed_integration:
+                            if result['order_completed']:
+                                if automatic_profile:
+                                    cleanup_run_id = run['id']
                                 else:
-                                    result['worktree_cleanup'] = {'status': 'deferred', 'reason': result['local_target_sync']['reason']}
+                                    result['worktree_cleanup'] = wf.cleanup_after_merge(store, state, run)
+                            else:
+                                result['worktree_cleanup'] = {'status': 'deferred', 'reason': result['local_target_sync']['reason']}
+            if automatic_profile:
+                try:
+                    result = restore_delivery_profile(root, store, key, grant)
+                except (ReviewError, wf.WorkflowError, ws.RunError, OSError, subprocess.TimeoutExpired) as error:
+                    result['profile_maintenance_error'] = str(error)
+                if cleanup_run_id:
+                    try:
+                        with ws.publication_lock(root, snapshot['remote'], snapshot['target_branch']), store.lock():
+                            persisted = json.loads(path.read_text())
+                            state = store.load()
+                            run = state['run_registry']['runs'].get(cleanup_run_id)
+                            if (run is None or run['delivery'].get('publication') != relative
+                                    or persisted != {k: v for k, v in result.items() if k != 'profile_maintenance_error'}):
+                                raise ReviewError('The publication changed during profile maintenance')
+                            result['worktree_cleanup'] = wf.cleanup_after_merge(store, state, run)
+                    except (ReviewError, wf.WorkflowError, ws.RunError, OSError, subprocess.TimeoutExpired) as error:
+                        result['worktree_cleanup'] = {'status': 'deferred', 'reason': str(error)}
             result={'publication_id':key,**result}
+            if explicit_source:
+                result['source_checkout']=source_checkout
         print(json.dumps(result,indent=2,ensure_ascii=False));return 0
+    except HandoffHold as exc:
+        print(json.dumps(exc.result,ensure_ascii=False));return 2
     except (ReviewError,ws.RunError,OSError,ValueError,KeyError,subprocess.TimeoutExpired) as exc:
         print(json.dumps({'ok':False,'error':str(exc)},ensure_ascii=False));return 2
 

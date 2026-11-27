@@ -1,10 +1,14 @@
 'use strict';
 const fs=require('node:fs'),path=require('node:path');
+const {randomUUID}=require('node:crypto');
 const c=require('./composer.js');
 const development=require('./development-policies.js');
 const BEGIN='<!-- BEGIN skill-tree-skills -->',END='<!-- END skill-tree-skills -->';
 const INSTALL='.skill-tree/installation',PROFILE=INSTALL+'/profile.json';
 const AGENTS_PATH='AGENTS.md',REGENERATE_AGENTS=Symbol('regenerate-agents');
+const INITIAL_WORKTREE_PROFILE=Symbol('initial-worktree-profile');
+const SETUP_OPERATIONS='.skill-tree/artifacts/setup-operations';
+const setupOperationId=/^OP-[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/;
 const isCodexBridge=record=>Array.isArray(record?.providers)&&record.providers.includes('codex');
 const TASK_GROUPING_SOURCE='common/scripts/workflow-state.py';
 const TASK_GROUPING_BUNDLE=INSTALL+'/source/'+TASK_GROUPING_SOURCE;
@@ -108,14 +112,21 @@ function groupedTaskHeaders(root){
  }
  return false;
 }
+function usesSharedWorkflow(profile){
+ const layout=profile?.workflow_runtime;
+ if(layout!==undefined&&layout!=='owned-v1')throw Error('Unknown owned workflow runtime layout');
+ return layout==='owned-v1';
+}
 function taskGroupingProof(profile,readSource){
  const source=readSource();
  if(source===null||!taskGroupingMarker.test(String(source)))return undefined;
  const digest=c.hash(source);
  if(profile.source_digests[TASK_GROUPING_SOURCE]!==digest||profile.bundle_digests[TASK_GROUPING_BUNDLE]!==digest)return undefined;
+ const providers=profile.bundle_digests[INSTALL+'/source/config/providers.json'];
+ const helperDigest=usesSharedWorkflow(profile)?c.hash(c.sharedWorkflowEntrypoint(source,providers)):digest;
  const helpers=Object.entries(profile.destinations).filter(([,record])=>Object.hasOwn(record.files,TASK_GROUPING_HELPER));
- if(!helpers.length||helpers.some(([,record])=>record.files[TASK_GROUPING_HELPER]!==digest))return undefined;
- return {schema:1,source_helper_sha256:digest,package_helpers:Object.fromEntries(helpers.map(([rel])=>[rel+'/'+TASK_GROUPING_HELPER,digest]))};
+ if(!helpers.length||helpers.some(([,record])=>record.files[TASK_GROUPING_HELPER]!==helperDigest))return undefined;
+ return {schema:1,source_helper_sha256:digest,package_helpers:Object.fromEntries(helpers.map(([rel])=>[rel+'/'+TASK_GROUPING_HELPER,helperDigest]))};
 }
 function verifyTaskGroupingProof(profile,readFile){
  if(!profile||!Object.hasOwn(profile,'task_grouping'))return undefined;
@@ -259,8 +270,17 @@ function verifyPluginBackups(root){
  }
  if(c.json(actual)!==c.json(expected.sort()))throw conflict();
 }
-function recover(root,channel='core'){
- const paths=transactionPaths(channel),journal=c.readJson(root,paths.journal,null);if(!journal)return;
+function recover(root,channel='core',observed){
+ const paths=transactionPaths(channel);
+ let journal;
+ if(observed===undefined)journal=c.readJson(root,paths.journal,null);
+ else{
+  const raw=setupProofBytes(root,paths.journal);
+  const current=raw===null?null:Buffer.isBuffer(raw)?c.hash(raw):'unavailable';
+  if(current==='unavailable'||current!==observed)throw Error('Cannot recover a journal without its exact sealed bytes');
+  if(raw!==null){journal=JSON.parse(raw.toString('utf8').replace(/^\uFEFF/,''));if(!journal)throw Error('Unsupported installation journal');}
+ }
+ if(!journal)return;
  const tree=rel=>treeHash(root,rel,channel==='plugins');
  if(journal.schema!==1||!Array.isArray(journal.entries)||Object.hasOwn(journal,'channel')&&journal.channel!==channel||channel==='plugins'&&journal.channel!=='plugins')throw Error('Unsupported installation journal');
  for(const e of journal.entries){
@@ -300,10 +320,11 @@ function recover(root,channel='core'){
  fs.unlinkSync(c.safe(root,paths.journal));
  // Backups retain one completed generation for explicit reviewed rollback.
 }
-function transaction(root,changes,expected={},beforeActivate=null,channel='core'){
+function transaction(root,changes,expected={},beforeActivate=null,channel='core',sealJournal,guardedOperation){
  const {stage,backups,journal}=transactionPaths(channel);
  const plugin=channel==='plugins',tree=rel=>treeHash(root,rel,plugin);
  const staging=c.safe(root,stage),journalPath=c.safe(root,journal);
+ let sealed;
  if(fs.existsSync(staging)){
   if(plugin)throw Error('Plugin staging already exists; inspect the retained files before retrying');
   fs.rmSync(staging,{recursive:true});
@@ -322,29 +343,173 @@ function transaction(root,changes,expected={},beforeActivate=null,channel='core'
   if(beforeActivate)beforeActivate();
   if(!entries.length)return;
   if(plugin)verifyPluginBackups(root);
-  if(fs.existsSync(c.safe(root,backups)))fs.rmSync(c.safe(root,backups),{recursive:true});
   const metadata=plugin?{}:{project_root:fs.realpathSync(root)};
-  fs.writeFileSync(journalPath,c.json({schema:1,channel,entries,...metadata}));
+  const journalBytes=c.json({schema:1,channel,entries,...metadata,
+   ...(guardedOperation?{guarded_operation:guardedOperation}:{})});
+  if(sealJournal){sealJournal(journalBytes);sealed=c.hash(journalBytes);}
+  if(fs.existsSync(c.safe(root,backups)))fs.rmSync(c.safe(root,backups),{recursive:true});
+  fs.writeFileSync(journalPath,journalBytes);
  }finally{
   if(!fs.existsSync(journalPath))fs.rmSync(staging,{recursive:true,force:true});
  }
- recover(root,channel);
+ recover(root,channel,sealed);
 }
-function locked(root,action,{recoverPending=true,recoverPluginPending=true,onPending}={}){
+function setupProofBytes(root,relative,limit=16*1024*1024){
+ try{
+  const file=c.safe(root,relative);
+  const stat=fs.lstatSync(file,{throwIfNoEntry:false});
+  if(!stat)return null;
+  if(!stat.isFile()||stat.size>limit)return 'unavailable';
+  const fd=fs.openSync(file,fs.constants.O_RDONLY|fs.constants.O_NOFOLLOW|fs.constants.O_NONBLOCK);
+  try{
+   const actual=fs.fstatSync(fd);
+   if(!actual.isFile()||actual.dev!==stat.dev||actual.ino!==stat.ino||actual.size>limit)return 'unavailable';
+   const raw=Buffer.alloc(actual.size+1);
+   const size=fs.readSync(fd,raw,0,raw.length,0);
+   if(size!==actual.size||fs.fstatSync(fd).mtimeMs!==actual.mtimeMs)return 'unavailable';
+   return raw.subarray(0,size);
+  }finally{fs.closeSync(fd);}
+ }catch{return 'unavailable';}
+}
+function setupObservation(root){
+ const inputs={profile_sha256:PROFILE};
+ for(const channel of ['core','plugins']){
+  const {journal,last}=transactionPaths(channel);
+  inputs[channel+'_journal_sha256']=journal;
+  inputs[channel+'_last_sha256']=last;
+ }
+ return Object.fromEntries(Object.entries(inputs).map(([key,relative])=>{
+  const raw=setupProofBytes(root,relative);
+  return [key,Buffer.isBuffer(raw)?c.hash(raw):raw];
+ }));
+}
+function writeSetupReceipt(root,relative,record,exclusive){
+ const target=c.safe(root,relative);
+ fs.mkdirSync(path.dirname(target),{recursive:true});
+ const temporary=c.safe(root,SETUP_OPERATIONS+'/.pending-'+randomUUID());
+ try{
+  const fd=fs.openSync(temporary,'wx',0o600);
+  try{fs.writeFileSync(fd,c.json(record));fs.fsyncSync(fd);}finally{fs.closeSync(fd);}
+  if(exclusive)fs.linkSync(temporary,c.safe(root,relative));
+  else fs.renameSync(temporary,c.safe(root,relative));
+ }finally{fs.rmSync(temporary,{force:true});}
+}
+function setupRequestDigest(kind,scope,layout){
+ const request={kind,scope};
+ return c.hash(c.json(kind==='install'?{...request,workflow_layout:layout}:request));
+}
+function beginSetupOperation(root,setup){
+ const id=setup.id??'OP-'+randomUUID();
+ if(!setupOperationId.test(id))throw Error('Select an exact setup operation ID');
+ const relative=SETUP_OPERATIONS+'/'+id+'.json';
+ const scope=setup.scope();
+ const requestFor=layout=>setupRequestDigest(setup.kind,scope,layout);
+ const current=setupObservation(root);
+ const retained=setupProofBytes(root,relative,4096);
+ if(retained==='unavailable')throw Error('The selected setup operation receipt cannot be read');
+ const previous=retained===null?null:JSON.parse(retained);
+ let layout=setup.sharedWorkflow??previous?.workflow_layout??null;
+ if(setup.kind==='install'&&setup.sharedWorkflow===undefined&&current.core_journal_sha256===null){
+  try{layout=usesSharedWorkflow(receipt(root));}catch{layout=null;}
+ }
+ if(previous){
+  if(previous.schema!==1||previous.operation_id!==id||previous.kind!==setup.kind||
+     previous.request_sha256!==requestFor(previous.workflow_layout??null)||
+     !['pending','failed','completed'].includes(previous.status)||
+     !Number.isSafeInteger(previous.attempts)||previous.attempts<1)
+   throw Error('Setup operation ID belongs to a different request');
+  if(setup.kind==='install'&&previous.workflow_layout!=null&&layout!==null&&previous.workflow_layout!==layout)
+   throw Error('Setup operation ID belongs to a different workflow runtime layout');
+  if(previous.status==='completed'){
+   if(Object.values(current).includes('unavailable')||c.json(current)!==c.json(previous.observed)||
+      current.core_journal_sha256!==null||current.plugins_journal_sha256!==null)
+    throw Error('The completed setup operation no longer covers the observed journal or profile');
+   return {id,replayed:true,layout};
+  }
+  for(const channel of ['core','plugins']){
+   const journal=channel+'_journal_sha256',last=channel+'_last_sha256';
+   const activation=channel==='core'?previous.activation_journal_sha256:null;
+   const expected=activation??previous.before?.[journal];
+   const consumed=typeof expected==='string'&&expected!=='unavailable'&&current[journal]===null&&
+     current[last]===expected&&previous.before[last]!==expected;
+   const unpublished=activation&&current[journal]===null&&current[last]===previous.observed[last]&&
+     current.profile_sha256===previous.observed.profile_sha256;
+   if(expected==='unavailable'||current[journal]!==expected&&!consumed&&!unpublished)
+    throw Error('Setup operation journal changed since the original attempt');
+  }
+ }
+ if(!previous&&setup.requireOriginalRecovery&&
+    (current.core_journal_sha256!==null||current.plugins_journal_sha256!==null))
+  throw Error('Recover the original owned installation operation before guarded refresh');
+ const timestamp=new Date().toISOString();
+ layout=previous?.workflow_layout??layout;
+ const record={schema:1,operation_id:id,kind:setup.kind,request_sha256:requestFor(layout),
+  status:'pending',stage:'recover',started_at:previous?.started_at??timestamp,observed_at:timestamp,
+  attempts:(previous?.attempts??0)+1,before:previous?.before??current,observed:current,
+  activation_journal_sha256:previous?.activation_journal_sha256??null};
+ if(setup.kind==='install')record.workflow_layout=layout;
+ writeSetupReceipt(root,relative,record,!previous);
+ return {id,record,relative,frontier:current,requestFor};
+}
+function freezeSetupWorkflow(root,session,requested){
+ const layout=requested??usesSharedWorkflow(receipt(root));
+ if(!session)return layout;
+ if(session.record.workflow_layout===null){
+  session.record={...session.record,workflow_layout:layout,request_sha256:session.requestFor(layout),
+   stage:'install',observed_at:new Date().toISOString(),observed:setupObservation(root)};
+  writeSetupReceipt(root,session.relative,session.record,false);
+ }else if(session.record.workflow_layout!==layout){
+  throw Error('Setup operation ID belongs to a different workflow runtime layout');
+ }
+ return layout;
+}
+function sealSetupActivation(root,session,journalBytes){
+ if(Buffer.byteLength(journalBytes)>16*1024*1024)throw Error('The installation activation journal exceeds the proof limit');
+ session.record={...session.record,stage:'install',activation_journal_sha256:c.hash(journalBytes),
+  observed_at:new Date().toISOString(),observed:setupObservation(root)};
+ writeSetupReceipt(root,session.relative,session.record,false);
+}
+function finishSetupOperation(root,session,status,stage){
+ if(!session)return;
+ writeSetupReceipt(root,session.relative,{...session.record,status,stage,
+  observed_at:new Date().toISOString(),observed:setupObservation(root)},false);
+}
+function locked(root,action,{recoverPending=true,recoverPluginPending=true,onPending,setup,beforeRecovery}={}){
  const owner=queueRoot(root),barrier=owner!==root?path.join(owner,INSTALL+'/.install-lock'):null;let barrierFd;
  if(barrier){fs.mkdirSync(path.dirname(barrier),{recursive:true});try{barrierFd=fs.openSync(barrier,'wx',0o600);fs.writeFileSync(barrierFd,c.json({pid:process.pid,host:require('node:os').hostname()}));}catch{throw Error('Canonical installation lock exists');}}
  const dir=c.safe(root,INSTALL);fs.mkdirSync(dir,{recursive:true});const lock=c.safe(root,INSTALL+'/.install-lock');let fd;
  try{fd=fs.openSync(lock,'wx',0o600);}catch{if(barrier){fs.closeSync(barrierFd);fs.unlinkSync(barrier);}throw Error('Installation lock exists; inspect PID/host before explicit removal');}
  try{fs.writeFileSync(fd,c.json({pid:process.pid,host:require('node:os').hostname()}));if(fs.existsSync(c.safe(owner,'.skill-tree/.writer-lock')))throw Error('Workflow writer lock exists; reach a cleanup/handoff boundary before installation');
-  const pluginPending=fs.existsSync(c.safe(root,transactionPaths('plugins').journal));
-  if(pluginPending&&!recoverPluginPending)throw Error('Plugin installation recovery is required; use the owned manager --recover');
-  const pending=pluginPending||fs.existsSync(c.safe(root,transactionPaths('core').journal));
-  if(pending&&!recoverPending){
-   if(typeof onPending==='function')return onPending();
-   throw Error('Owned installation recovery is required before this operation');
+  beforeRecovery?.();
+  const session=setup?beginSetupOperation(root,setup):null;
+  if(session?.replayed)return {...setup.replay(session.layout),operation_id:session.id,replayed:true};
+  let stage='recover',value;
+  try{
+   if(session&&['core','plugins'].some(channel=>session.frontier[channel+'_journal_sha256']==='unavailable'))
+    throw Error('Cannot recover a journal without its exact sealed bytes');
+   const pluginPending=fs.existsSync(c.safe(root,transactionPaths('plugins').journal));
+   if(pluginPending&&!recoverPluginPending)throw Error('Plugin installation recovery is required; use the owned manager --recover');
+   const pending=pluginPending||fs.existsSync(c.safe(root,transactionPaths('core').journal));
+   if(pending&&!recoverPending){
+    if(typeof onPending==='function')return onPending();
+    throw Error('Owned installation recovery is required before this operation');
+   }
+   if(pending&&hasActiveOperation(root))throw Error('Active controller must reach a stopped cleanup/handoff before transaction recovery');
+   recover(root,'core',session?.frontier.core_journal_sha256);
+   recover(root,'plugins',session?.frontier.plugins_journal_sha256);
+   stage=setup?.kind==='install'?'install':'recover';
+   value=action(session);
+  }catch(error){
+   if(session){
+    error.operation_id=session.id;
+    try{finishSetupOperation(root,session,'failed',stage);}catch{error.operation_receipt_pending=true;}
+   }
+   throw error;
   }
-  if(pending&&hasActiveOperation(root))throw Error('Active controller must reach a stopped cleanup/handoff before transaction recovery');
-  recover(root);recover(root,'plugins');return action();
+  if(!session)return value;
+  try{finishSetupOperation(root,session,'completed','complete');}
+  catch(error){error.operation_id=session.id;throw error;}
+  return {...value,operation_id:session.id};
  }finally{fs.closeSync(fd);fs.unlinkSync(lock);if(barrier){fs.closeSync(barrierFd);fs.unlinkSync(barrier);}}
 }
 function bundle(source,flavor){
@@ -372,12 +537,16 @@ function plan(root,source,flavor,selections,options={}){
    verifyInstalled(root);verifyPluginBackups(root);
   }
  }
- if(hasActiveOperation(root))throw Error('Active controller must checkpoint at a stopped cleanup/handoff point before installation or refresh');
+ if(!options[INITIAL_WORKTREE_PROFILE]&&hasActiveOperation(root))throw Error('Active controller must checkpoint at a stopped cleanup/handoff point before installation or refresh');
  const requested=[...selections];
  if(old)for(const [rel,record] of Object.entries(old.destinations))requested.push({rel,provider:record.provider,providers:owners(record),name:record.name});
  const merged={};for(const item of requested){if(!merged[item.rel])merged[item.rel]={...item,providers:[]};merged[item.rel].providers=[...new Set([...merged[item.rel].providers,...(item.providers||[item.provider])])].sort();}
  const unique=Object.values(merged),names=[...new Set(unique.map(s=>s.name))];
- const profile=c.resolveProfile(source,root,flavor,options),built=c.compose(source,profile,names),changes={},destinations={...(old?.destinations||{})};
+ const previousLayout=usesSharedWorkflow(old);
+ const ownedWorkflow=options.sharedRuntime??previousLayout;
+ if(typeof ownedWorkflow!=='boolean')throw Error('Select an explicit supported workflow runtime layout');
+ const profile=c.resolveProfile(source,root,flavor,options);
+ const built=c.compose(source,profile,names,{ownedWorkflow}),changes={},destinations={...(old?.destinations||{})};
  const policyBefore=treeHash(root,development.CONFIG);
  if(Object.hasOwn(options,'developmentPolicy'))changes[development.CONFIG]=options.developmentPolicy;
  for(const item of unique){
@@ -425,6 +594,7 @@ function plan(root,source,flavor,selections,options={}){
   source_digests=old.source_digests;
  }
  const next={...profile,source_digests,destinations,bridges,bundle_digests};
+ if(ownedWorkflow)next.workflow_runtime='owned-v1';
  const grouping=taskGroupingProof(next,()=>maintenance['source/'+TASK_GROUPING_SOURCE]??null);
  if(grouping)next.task_grouping=grouping;
  next.identity=compositionIdentity(next);
@@ -452,9 +622,12 @@ function verify(root,source,allowForeign=false,operation){
  if(fs.existsSync(c.safe(root,transactionPaths('plugins').journal)))throw Error('Plugin installation recovery is required before profile verification');
  const p=receipt(root,true,allowForeign);verifyOwned(root,p,true,operation);const bundleSource=c.safe(root,INSTALL+'/source');
  const now=c.resolveProfile(bundleSource,root,p.flavor);
- for(const field of ['source_version','inputs','inventory','facts','recipes','gaps','environment_id','execution_bindings','worktree_environment','plugins','development_policies'])if(c.json(now[field])!==c.json(p[field]))throw Error('Profile refresh-required or resolved profile mismatch: node .skill-tree/installation/manager.js --refresh-profile');
+ for(const field of ['source_version','inputs','inventory','facts','recipes','gaps','environment_id','execution_bindings','worktree_environment','plugins','development_policies'])if(c.json(now[field])!==c.json(p[field])){
+  throw Object.assign(Error('Profile refresh-required or resolved profile mismatch: node .skill-tree/installation/manager.js --refresh-profile'),{code:'ST_PROFILE_REFRESH_REQUIRED'});
+ }
  if(p.identity!==compositionIdentity(p))throw Error('Composition receipt identity mismatch');
- const generated=c.compose(bundleSource,now,[...new Set(Object.values(p.destinations).map(record=>record.name))]);
+ const generated=c.compose(bundleSource,now,[...new Set(Object.values(p.destinations).map(record=>record.name))],
+  {ownedWorkflow:usesSharedWorkflow(p)});
  const providers=c.readJson(bundleSource,'config/providers.json').providers;
  for(const [rel,record] of Object.entries(p.destinations)){
   if(record.flavor!==p.flavor||record.identity!==c.hash(c.json(record.files))||c.json(generated.output_digests[record.name])!==c.json(record.files))throw Error('Package identity/flavor does not match deterministic composition: '+rel);
@@ -511,23 +684,96 @@ function regenerateAgents(root,source,dryRun=false){
   return {action:'regenerated',changed:[AGENTS_PATH],bridge_sha256:hash};
  },{recoverPending:false,recoverPluginPending:false});
 }
+function installScope(source,flavor,selections,options){
+ return {source:c.sourceInputs(source),flavor,selections,bridges:options.bridges??[],
+  shared_workflow:options.sharedRuntime??'preserve-installed-layout',
+  development_policy:options.developmentPolicy??null,recover_pending:options.recoverPending!==false,
+  recover_plugins:options.recoverPluginPending!==false,
+  ...(options.guardedActivationProof?{guarded_activation_proof:options.guardedActivationProof}:{})};
+}
+
+function guardedInstallOperation(root,source,flavor,selections,options){
+ const id=options.operationId;
+ if(!setupOperationId.test(id)||!options.guardedActivationProof)
+  throw Error('Select the exact guarded installation operation');
+ const raw=setupProofBytes(root,SETUP_OPERATIONS+'/'+id+'.json',4096);
+ if(raw===null)return {receipt:null,journal:null,activated:false};
+ if(!Buffer.isBuffer(raw))throw Error('The original guarded installation receipt is unreadable');
+ const receipt=JSON.parse(raw);
+ if(receipt.schema!==1||receipt.operation_id!==id||receipt.kind!=='install'||
+    !['pending','failed','completed'].includes(receipt.status)||
+    receipt.request_sha256!==setupRequestDigest('install',installScope(source,flavor,selections,options),receipt.workflow_layout??null))
+  throw Error('The installation receipt belongs to another guarded refresh');
+ const current=setupObservation(root);
+ const sealed=receipt.activation_journal_sha256;
+ const verifyJournal=relative=>{
+  const rawJournal=setupProofBytes(root,relative);
+  if(!Buffer.isBuffer(rawJournal)||c.hash(rawJournal)!==sealed)
+   throw Error('The original guarded installation journal changed');
+  const journal=JSON.parse(rawJournal);
+  if(journal.schema!==1||journal.channel!=='core'||journal.project_root!==root||!Array.isArray(journal.entries)||
+     journal.guarded_operation?.id!==id||journal.guarded_operation?.request_sha256!==receipt.request_sha256)
+   throw Error('The original guarded installation journal is invalid');
+  return journal;
+ };
+ if(current.plugins_journal_sha256!==null)throw Error('Recover the original plugin installation separately');
+ if(sealed&&current.core_journal_sha256===sealed&&receipt.status!=='completed'){
+  return {receipt,journal:verifyJournal(transactionPaths().journal),activated:false};
+ }
+ const activated=Boolean(sealed&&current.core_journal_sha256===null&&current.core_last_sha256===sealed&&
+  receipt.before?.core_last_sha256!==sealed);
+ if(activated)verifyJournal(transactionPaths().last);
+ if(receipt.status==='completed'&&(!activated||c.json(current)!==c.json(receipt.observed)))
+  throw Error('The original guarded installation no longer matches its acknowledgement');
+ return {receipt,journal:null,activated};
+}
+
+function guardedMissingDestination(root,operation,relative,before,after){
+ if(!operation.journal)return false;
+ const matches=operation.journal.entries.filter(entry=>entry.dest===relative);
+ if(matches.length!==1)return false;
+ const entry=matches[0];
+ const {backups,stage}=transactionPaths();
+ if(path.posix.dirname(entry.backup??'')!==backups||path.posix.dirname(entry.staged??'')!==stage)return false;
+ const oldBytes=setupProofBytes(root,entry.backup), nextBytes=setupProofBytes(root,entry.staged);
+ return Buffer.isBuffer(oldBytes)&&Buffer.isBuffer(nextBytes)&&c.hash(oldBytes)===before&&
+  c.hash(nextBytes)===after&&treeHash(root,entry.backup)===entry.old&&treeHash(root,entry.staged)===entry.next;
+}
+
 function install(root,source,flavor,selections,options={}){
  if(options.dryRun){const result=plan(root,source,flavor,selections,options);return {profile:result.profile,delta:result.delta,action:'dry-run'};}
- return locked(root,()=>{
-  const planned=options.updateDevelopmentPolicy?{...options,developmentPolicy:options.updateDevelopmentPolicy()}:options;
+ const setup={
+  kind:'install',id:options.operationId,sharedWorkflow:options.sharedRuntime,
+  scope:()=>installScope(source,flavor,selections,options),
+  requireOriginalRecovery:Boolean(options.guardedActivationProof),
+  replay:sharedRuntime=>{
+   if(options.verifyActivationReplay)return options.verifyActivationReplay();
+   if(options.guardPlan||options.updateDevelopmentPolicy)throw Error('Guarded installation replay requires a fresh operation');
+   const candidate=plan(root,source,flavor,selections,{...options,sharedRuntime});
+   if(candidate.delta.length)throw Error('The previously verified setup generation changed');
+   return {profile:verify(root,source),delta:[],action:'verified no-op current'};
+  }
+ };
+ return locked(root,(session)=>{
+  const sharedRuntime=freezeSetupWorkflow(root,session,options.sharedRuntime);
+  const planned={...options,sharedRuntime};
+  if(options.updateDevelopmentPolicy)planned.developmentPolicy=options.updateDevelopmentPolicy();
   const result=plan(root,source,flavor,selections,planned);
   options.guardPlan?.(result);
   transaction(root,result.changes,result.expected,()=>{
    const current=c.resolveProfile(source,root,flavor,planned);
    if(current.environment_id!==result.profile.environment_id)throw Error('Project inputs changed during profile staging; refresh from current inputs');
    options.guardPlan?.(result);
-  });
+  },'core',session?(journalBytes)=>sealSetupActivation(root,session,journalBytes):undefined,
+    session&&options.guardedActivationProof?{id:session.id,request_sha256:session.record.request_sha256}:undefined);
   try{verify(root,source);}catch(error){
    if(result.delta.length){try{restoreGeneration(root);}catch(recovery){throw Error('Profile verification failed; preserved generation backups require conflict review: '+error.message+'; '+recovery.message);}}
    throw error;
   }
   return {profile:result.profile,delta:result.delta,action:result.delta.length?'installed':'verified no-op current'};
- },{recoverPending:options.recoverPending,recoverPluginPending:options.recoverPluginPending});
+ },{recoverPending:options.recoverPending,recoverPluginPending:options.recoverPluginPending,
+    beforeRecovery:options.beforeActivationRecovery,
+    setup:Object.hasOwn(options,INITIAL_WORKTREE_PROFILE)?undefined:setup});
 }
 function uninstall(root,selections,options={}){
  function action(){const p=receipt(root,true);verifyOwned(root,p);if(hasActiveOperation(root))throw Error('Active controller must stop before uninstall');const next=JSON.parse(c.json(p)),changes={},expected={};
@@ -553,6 +799,377 @@ function uninstall(root,selections,options={}){
  return options.dryRun?action():locked(root,action,{recoverPluginPending:options.recoverPluginPending});
 }
 function refresh(root,source,dryRun=false){const p=receipt(root,true);return install(root,source,p.flavor,Object.entries(p.destinations).map(([rel,d])=>({rel,provider:d.provider,name:d.name})),{dryRun,bridges:Object.keys(p.bridges||{}),recoverPluginPending:false});}
+
+function initialWorktreeProfile(root, request, mode) {
+ if (!['install','verify','replay'].includes(mode) || typeof request.worktree !== 'string' || !path.isAbsolute(request.worktree)) {
+  throw Error('Select the exact run worktree profile action');
+ }
+ const target = fs.realpathSync(request.worktree);
+ const source = c.safe(root,INSTALL+'/source');
+ const {execFileSync} = require('node:child_process');
+ const git = (checkout,...args) => execFileSync('git',
+  ['--no-replace-objects','--no-optional-locks','-C',checkout,'-c','core.fsmonitor=false',...args],
+  {encoding:'utf8',stdio:['ignore','pipe','ignore'],timeout:5000}).trim();
+ const same = (left,right) => c.json(left) === c.json(right);
+ function verifyReservation() {
+  const state = c.read(root,WORKFLOW);
+  if (state === null || c.hash(state) !== request.state_sha256 || target !== request.worktree || target === root) {
+   throw Error('The original profile handoff or exact checkout changed');
+  }
+  const registry = JSON.parse(state).run_registry;
+  const run = registry?.runs?.[request.run_id];
+  const hold = run?.initial_profile;
+  const expectedStatus = mode === 'replay' ? 'admitted' : 'pending';
+  if (registry?.queue_id !== request.queue_id || run?.workspace_state !== 'ready' || hold?.status !== expectedStatus ||
+      (mode !== 'replay' && (run.phase !== 'refresh-profile' || run.stop_reason !== 'Initial worktree profile requires verified admission')) ||
+      hold.worktree_path_sha256 !== c.hash(target) ||
+      !same(Object.keys(registry.claims).filter(id=>registry.claims[id]===run.id).sort(),hold.claimed_task_ids)) {
+   throw Error('The reserved run, initial profile hold or original claims changed');
+  }
+  const common = path.resolve(root,git(root,'rev-parse','--git-common-dir'));
+  const locator = fs.readFileSync(path.join(common,'skill-tree-runtime.json'));
+  const local = JSON.parse(locator);
+  const registration = git(target,'rev-parse','--absolute-git-dir');
+  if (c.hash(locator) !== request.locator_sha256 || local.queue_id !== request.queue_id ||
+      local.canonical_root !== root || local.worktrees?.[run.id] !== target ||
+      git(target,'rev-parse','--show-toplevel') !== target ||
+      registration !== path.join(common,'worktrees',request.registration) ||
+      git(target,'symbolic-ref','--short','HEAD') !== run.workspace.branch ||
+      git(target,'rev-parse','--verify','HEAD') !== run.workspace.base_commit ||
+      !same(run.workspace.cleanup_owner??null,request.owner)) {
+   throw Error('The checkout or Git registration no longer matches the exact recorded worktree');
+  }
+  if (request.owner) {
+   const owner = c.readJson(registration,'skill-tree-owner.json');
+   if (!same(owner,request.owner)) throw Error('Restore the original worktree ownership record');
+  }
+  const profile = c.read(root,PROFILE);
+  if (profile === null || c.hash(profile) !== hold.source_profile_sha256 || c.hash(profile) !== request.source_profile_sha256) {
+   throw Error('Restore the original verified canonical profile before worktree setup');
+  }
+  const verified = verify(root,source);
+  if (mode !== 'replay' && (verified.identity !== run.admission.identity || verified.flavor !== run.admission.flavor)) {
+   throw Error('The canonical installation differs from the original run admission');
+  }
+  return verified;
+ }
+ const original = verifyReservation();
+ function isolatedDestination() {
+  const common = path.resolve(root,git(root,'rev-parse','--git-common-dir'));
+  const locator = c.readJson(common,'skill-tree-runtime.json');
+  const native = git(root,'worktree','list','--porcelain','-z').split('\0')
+   .filter(field=>field.startsWith('worktree ')).map(field=>field.slice('worktree '.length));
+  const peers = native.filter(checkout=>checkout!==root&&checkout!==target);
+  for (const locations of [locator.worktrees,locator.pending_worktrees||{}]) {
+   peers.push(...Object.entries(locations).filter(([id])=>id!==request.run_id).map(([,checkout])=>checkout));
+  }
+  function contains(parent, child) {
+   // Fold path spellings conservatively because a worktree may use a
+   // case-insensitive filesystem even when the checkout paths are distinct strings.
+   const comparable = value => value.normalize('NFD').toLowerCase();
+   const relative = path.relative(comparable(parent),comparable(child));
+   return relative!=='..'&&!relative.startsWith('..'+path.sep)&&!path.isAbsolute(relative);
+  }
+  const ownedArea = path.join(common,'skill-tree-worktrees');
+  if (!native.includes(target) || contains(target,root)) return false;
+  if (contains(common,target)) {
+   if (!contains(ownedArea,target)||contains(target,ownedArea))return false;
+  } else if (contains(root,target)) {
+   return false;
+  }
+  return peers.every(checkout=>{
+   if(typeof checkout!=='string'||!path.isAbsolute(checkout))return false;
+   const actual = fs.existsSync(checkout)?fs.realpathSync(checkout):checkout;
+   return !contains(actual,target)&&!contains(target,actual);
+  });
+ }
+ const scope = profile => Object.fromEntries(Object.entries(profile.destinations)
+  .map(([relative,row])=>[relative,{name:row.name,providers:[...owners(row)].sort()}]));
+ const expected = scope(original);
+ const validate = candidate => {
+  if (candidate.flavor !== original.flavor || !same(candidate.bundle_digests,original.bundle_digests) ||
+      !same(scope(candidate),expected) || usesSharedWorkflow(candidate)!==usesSharedWorkflow(original))
+   throw Error('Worktree profile requires the original owned flavor, source generation, runtime layout and provider destinations');
+  if (!same(candidate.plugins,original.plugins)) {
+   throw Error('Restore the original configured plugin generation in the exact worktree through the owned plugin setup path');
+  }
+ };
+ if (mode === 'install' && c.read(target,PROFILE) === null) {
+  const selections = Object.entries(expected).flatMap(([rel,row])=>row.providers.map(provider=>({rel,provider,name:row.name})));
+  const isolated = isolatedDestination();
+  install(target,source,original.flavor,selections,{[INITIAL_WORKTREE_PROFILE]:isolated,recoverPending:false,
+   recoverPluginPending:false,sharedRuntime:usesSharedWorkflow(original),
+   guardPlan(planned){
+    verifyReservation();
+    if (isolated && !isolatedDestination()) throw Error('The reserved profile destination now overlaps another checkout');
+    validate(planned.profile);
+    if (Object.keys(planned.changes).some(relative=>!relative.startsWith(INSTALL+'/') && !Object.hasOwn(expected,relative))) {
+     throw Error('Initial profile setup cannot change product files, bridges or workflow metadata');
+    }
+   }});
+ }
+ const candidate = verify(target,source);
+ validate(candidate);
+ const response = {profile_sha256:c.hash(c.read(target,PROFILE)),
+  admission:{identity:candidate.identity,environment_id:candidate.environment_id,flavor:candidate.flavor}};
+ verifyReservation();
+ return response;
+}
+
+function packageMetadataAtDelivery(root, request){
+ const {execFileSync}=require('node:child_process');
+ function git(...args){
+  return execFileSync('git',['--no-replace-objects','--no-optional-locks','--literal-pathspecs',
+   '-C',root,'-c','core.fsmonitor=false',...args],{
+   encoding:'buffer',stdio:['ignore','pipe','ignore'],timeout:5000,
+   env:{...process.env,GIT_NO_LAZY_FETCH:'1'}
+  });
+ }
+ const {target_ref:ref,target_head:head,previous_local_head:previous}=request;
+ const commit=/^(?:[0-9a-f]{40}|[0-9a-f]{64})$/;
+ if(!commit.test(head)||!commit.test(previous)||head===previous||
+    git('symbolic-ref','--quiet','--no-recurse','HEAD').toString().trim()!==ref||
+    git('rev-parse','--verify','HEAD').toString().trim()!==head)
+  throw Error('Profile maintenance requires the exact synchronized target and original local commit');
+ git('merge-base','--is-ancestor',previous,head);
+ const entry=revision=>git('ls-tree',revision,'--','package.json').toString().trim();
+ const newEntry=entry(head),oldEntry=entry(previous),staged=git('ls-files','--stage','--','package.json').toString().trim();
+ const fileEntry=/^(100(?:644|755)) blob ([0-9a-f]{40}|[0-9a-f]{64})\tpackage\.json$/;
+ const current=fileEntry.exec(newEntry),before=fileEntry.exec(oldEntry);
+ if(!current||!before||current[1]!==before[1]||staged!==current[1]+' '+current[2]+' 0\tpackage.json')
+  throw Error('Compatibility requires a regular, unstaged package.json with the original mode');
+ const original=git('cat-file','blob',before[2]),synchronized=git('cat-file','blob',current[2]);
+ const packagePath=c.safe(root,'package.json');
+ const fd=fs.openSync(packagePath,fs.constants.O_RDONLY|fs.constants.O_NOFOLLOW|fs.constants.O_NONBLOCK);
+ try{
+  const stat=fs.fstatSync(fd);
+  if(!stat.isFile()||Boolean(stat.mode&0o100)!==(current[1]==='100755')||!fs.readFileSync(fd).equals(synchronized))
+   throw Error('Compatibility requires the exact committed package.json bytes and mode');
+ }finally{fs.closeSync(fd);}
+ return comparePackageMetadata(original,synchronized);
+}
+
+function comparePackageMetadata(original,synchronized){
+ const decode=value=>JSON.parse(value.toString('utf8').replace(/^\uFEFF/,''));
+ const oldPackage=decode(original),newPackage=decode(synchronized);
+ if(!oldPackage||typeof oldPackage!=='object'||Array.isArray(oldPackage)||
+    !newPackage||typeof newPackage!=='object'||Array.isArray(newPackage))
+  throw Error('Compatibility requires complete package metadata objects');
+ const metadata=new Set(['description','keywords']);
+ const fields=[...new Set([...Object.keys(oldPackage),...Object.keys(newPackage)])]
+  .sort().filter(key=>c.json(oldPackage[key])!==c.json(newPackage[key]));
+ if(!fields.length||fields.some(field=>!metadata.has(field)))
+  throw Error('The package change includes material or unexplained inputs');
+ return {before:c.hash(original),after:c.hash(synchronized),fields};
+}
+
+function requireUnaffectedProfileRuns(root){
+ const state=workflowState(root);
+ const runs=state?.run_registry ? Object.values(state.run_registry.runs) : [state?.active_run];
+ if(runs.some(unfinishedRun)||hasActiveOperation(root))
+  throw Error('Unfinished canonical work requires the explicit profile recovery path');
+}
+
+function compatibleProfilePlan(root, profileSha, input, result, inputName='package.json'){
+ const {old,profile:after}=result;
+ const oldSha=c.hash(fs.readFileSync(c.safe(root,PROFILE)));
+ if(oldSha!==profileSha||old.inputs[inputName]!==input.before||after.inputs[inputName]!==input.after)
+  throw Error('The owned profile inputs differ from the exact original and current Git bytes');
+ const inputs={...after.inputs,[inputName]:input.before};
+ if(c.json(inputs)!==c.json(old.inputs))
+  throw Error('Discovered profile inputs include material or unknown changes');
+ const comparison=profile=>{
+  const {inputs,environment_id,identity,destinations,...stable}=profile;
+  const owners=Object.fromEntries(Object.entries(destinations).map(([relative,record])=>{
+   const {files,identity,...ownership}=record;
+   return [relative,ownership];
+  }));
+  return {...stable,destinations:owners};
+ };
+ if(c.json(comparison(old))!==c.json(comparison(after)))
+  throw Error('Resolved profile facts, policy, source, bindings, or recipes changed');
+ const identity=(profile,profile_sha256)=>({profile_sha256,identity:profile.identity,environment_id:profile.environment_id});
+ return {before:identity(old,oldSha),after:identity(after,c.hash(result.changes[PROFILE])),
+  input:inputName,changed_fields:input.fields};
+}
+
+function deliveryProfilePlan(root,request,result){
+ return compatibleProfilePlan(root,request.profile_sha256,packageMetadataAtDelivery(root,request),result);
+}
+
+function verifyCompatibleWorktree(root,request){
+ const {execFileSync}=require('node:child_process');
+ const git=(directory,...args)=>execFileSync('git',
+  ['--no-replace-objects','--no-optional-locks','--literal-pathspecs','-C',directory,'-c','core.fsmonitor=false',...args],
+  {encoding:'buffer',stdio:['ignore','pipe','ignore'],timeout:5000,
+   env:{...process.env,GIT_NO_LAZY_FETCH:'1',GIT_ALLOW_PROTOCOL:''}});
+ const query=(directory,...args)=>git(directory,...args).toString().trim();
+ const worktree=fs.realpathSync(request.worktree);
+ const checkpoint=setupProofBytes(root,WORKFLOW);
+ if(!Buffer.isBuffer(checkpoint)||c.hash(checkpoint)!==request.state_sha256||c.hash(worktree)!==request.worktree_path_sha256||
+    worktree!==request.worktree||worktree===root||queueRoot(worktree)!==root)
+  throw Error('The original compatible readmission checkpoint or worktree changed');
+ const state=JSON.parse(checkpoint);
+ const registry=state.run_registry;
+ const run=registry?.runs?.[request.run_id];
+ const worker=setupProofBytes(root,'.skill-tree/history/worker-handoffs/'+request.run_id.toLowerCase()+'.json');
+ if((Buffer.isBuffer(worker)?c.hash(worker):worker)!==request.worker_sha256)
+  throw Error('The original worktree worker handoff changed before compatible activation');
+ const common=path.resolve(root,query(root,'rev-parse','--git-common-dir'));
+ const locator=setupProofBytes(common,'skill-tree-runtime.json');
+ const local=Buffer.isBuffer(locator)?JSON.parse(locator):null;
+ const registration=query(worktree,'rev-parse','--absolute-git-dir');
+ if(registry?.queue_id!==request.queue_id||run?.workspace_state!=='ready'||
+    !Buffer.isBuffer(locator)||c.hash(locator)!==request.locator_sha256||local.queue_id!==request.queue_id||
+    local.worktrees?.[run.id]!==worktree||registration!==path.join(common,'worktrees',request.registration)||
+    query(worktree,'rev-parse','--show-toplevel')!==worktree||
+    query(worktree,'symbolic-ref','--short','HEAD')!==run.workspace.branch||
+    query(worktree,'rev-parse','--verify','HEAD')!==request.head||
+    c.json(run.workspace.cleanup_owner)!==c.json(request.owner)||
+    c.json(c.readJson(registration,'skill-tree-owner.json'))!==c.json(request.owner))
+  throw Error('The admitted worktree Git registration or original owner changed');
+ const playwright=request.kind==='playwright-discovery';
+ const inputName=playwright?'playwright.config.ts':'package.json';
+ if(playwright){
+  const queue=setupProofBytes(root,'.skill-tree/documents/future.md');
+  const progress=state.task_progress?.[run.current_task_id];
+  if(run.phase!=='refresh-profile'||run.admission?.flavor!=='web'||progress?.run_id!==run.id||
+     !['implementing','awaiting-validation'].includes(progress.stage)||
+     (request.queue_sha256!==undefined&&(!Buffer.isBuffer(queue)||c.hash(queue)!==request.queue_sha256))||
+     (request.task_id!==undefined&&request.task_id!==run.current_task_id))
+   throw Error('Select the exact stopped Web task and queue for Playwright discovery refresh');
+ }
+ const baseline=state.task_progress?.[run.current_task_id]?.task_git_baseline?.head;
+ if(![request.head,baseline,run.workspace.base_commit].includes(request.before_revision))
+  throw Error('Select an exact retained discovery input baseline');
+ git(worktree,'merge-base','--is-ancestor',request.before_revision,request.head);
+ const [beforeEntry,beforePath]=query(worktree,'ls-tree',request.before_revision,'--',inputName).split('\t');
+ const [indexEntry,indexPath]=query(worktree,'ls-files','--stage','--',inputName).split('\t');
+ const before=/^(100(?:644|755)) blob ([0-9a-f]{40}|[0-9a-f]{64})$/.exec(beforeEntry);
+ const index=/^(100(?:644|755)) ([0-9a-f]{40}|[0-9a-f]{64}) 0$/.exec(indexEntry);
+ const after=setupProofBytes(worktree,inputName);
+ if(!before||!index||beforePath!==inputName||indexPath!==inputName||before[1]!==index[1]||!Buffer.isBuffer(after)||
+    Boolean(fs.lstatSync(c.safe(worktree,inputName)).mode&0o100)!==(before[1]==='100755'))
+  throw Error('Compatibility requires exact regular discovery input with the original Git mode');
+ const original=git(worktree,'cat-file','blob',before[2]);
+ const input=playwright?{before:c.hash(original),after:c.hash(after),mode:before[1],index_oid:index[2],
+  fields:[inputName]}:comparePackageMetadata(original,after);
+ if(playwright&&input.before===input.after)
+  throw Error('An approved Playwright discovery refresh requires changed input bytes');
+ return {worktree,input,inputName};
+}
+
+function maintainCompatibleWorktreeProfile(root,request,mode){
+ if(!['preview','activate','verify'].includes(mode))
+  throw Error('Select the compatible worktree profile action');
+ const context=()=>verifyCompatibleWorktree(root,request);
+ const {worktree,input,inputName}=context();
+ const playwright=inputName==='playwright.config.ts';
+ const inputProof=playwright?'playwright_input':'package_input';
+ if(mode!=='preview'){
+  const state=c.readJson(root,WORKFLOW);
+  const original=state.run_registry?.runs?.[request.run_id]?.compatible_profile_refresh;
+  if(!original||original.operation_id!==request.operation_id||original.profile_sha256!==request.profile_sha256||
+     original.before_revision!==request.before_revision||request.plan.input!==inputName||c.json(original.plan)!==c.json(request.plan)||
+     c.json(input)!==c.json(request.plan[inputProof])||
+     (playwright&&(original.kind!==request.kind||original.queue_sha256!==request.queue_sha256||
+        original.task_id!==request.task_id||!original.approval?.owner_instruction||
+        !/^[a-f0-9]{64}$/.test(original.approval.expected_preview_sha256)||
+        c.json(original.approval)!==c.json(request.approval))))
+   throw Error(playwright?'The original Playwright profile plan, discovery input or owner approval changed':
+     'The original compatible profile plan or package input changed');
+ }
+ const source=c.safe(worktree,INSTALL+'/source');
+ const sourceSha=()=>c.hash(c.json(c.sourceInputs(source)));
+ const actual=result=>({profile_sha256:c.hash(setupProofBytes(worktree,PROFILE)),
+  identity:result.identity,environment_id:result.environment_id});
+ if(mode==='preview'){
+  const previous=receipt(worktree,true);
+  const selections=Object.entries(previous.destinations).map(([rel,row])=>({rel,provider:row.provider,name:row.name}));
+  const options={bridges:Object.keys(previous.bridges||{}),recoverPluginPending:false};
+  const proposed=plan(worktree,source,previous.flavor,selections,options);
+  const proof=compatibleProfilePlan(worktree,request.profile_sha256,input,proposed,inputName);
+  return {...proof,[inputProof]:input,source_sha256:sourceSha(),
+   install:{flavor:previous.flavor,selections,bridges:options.bridges}};
+ }
+ const {before,after:next,changed_fields:fields,install:scope}=request.plan;
+ const proof={before,after:next,input:inputName,changed_fields:fields};
+ const options={bridges:scope.bridges,recoverPluginPending:false,operationId:request.operation_id,
+  guardedActivationProof:request.plan};
+ const guardContext=()=>{
+  const verified=context();
+  if(c.json(verified.input)!==c.json(input))throw Error('The compatible worktree input changed');
+  if(sourceSha()!==request.plan.source_sha256||
+     c.resolveProfile(source,worktree,request.plan.install.flavor).environment_id!==request.plan.after.environment_id)
+   throw Error('The prepared worktree discovery inputs or owned source changed');
+  if(setupProofBytes(root,'.skill-tree/.transaction.json')!==null)
+   throw Error('Reconcile the original Core workflow transaction before worktree refresh');
+  const operation=guardedInstallOperation(worktree,source,scope.flavor,scope.selections,options);
+  const current=setupObservation(worktree).profile_sha256;
+  if(current!==before.profile_sha256&&
+     !(current===next.profile_sha256&&(operation.activated||operation.journal))&&
+     !(current===null&&guardedMissingDestination(worktree,operation,PROFILE,before.profile_sha256,next.profile_sha256)))
+   throw Error('The original compatible worktree installation generation changed');
+  return operation;
+ };
+ const verifyAfter=()=>{
+  if(!guardContext().activated)throw Error('The original compatible worktree refresh has no acknowledged activation');
+  const profile=verify(worktree,source);
+  if(c.json(actual(profile))!==c.json(request.plan.after)||profile.inputs[inputName]!==input.after)
+   throw Error('The installed worktree profile differs from the anticipated generation');
+  return {profile,delta:[],action:'verified compatible worktree profile'};
+ };
+ if(mode==='verify')return actual(verifyAfter().profile);
+ const guard=result=>{
+  guardContext();
+  if(c.hash(setupProofBytes(worktree,PROFILE))===request.plan.after.profile_sha256){
+   verifyAfter();
+   if(result.delta.length)throw Error('The verified compatible generation has unowned pending changes');
+   return;
+  }
+  if(c.json(compatibleProfilePlan(worktree,request.profile_sha256,input,result,inputName))!==c.json(proof))
+   throw Error('The prepared compatible worktree profile changed');
+ };
+ const installed=install(worktree,source,scope.flavor,scope.selections,{...options,
+  verifyActivationReplay:verifyAfter,beforeActivationRecovery:guardContext,guardPlan:guard});
+ return {profile:actual(installed.profile),operation_id:installed.operation_id};
+}
+
+function maintainDeliveredProfile(root,request){
+ const source=c.safe(root,INSTALL+'/source');
+ const options={recoverPending:false,recoverPluginPending:false};
+ if(request.phase==='verify'){
+  return locked(root,()=>{
+   packageMetadataAtDelivery(root,request);
+   const profile=verify(root,source);
+   const actual={profile_sha256:c.hash(fs.readFileSync(c.safe(root,PROFILE))),identity:profile.identity,environment_id:profile.environment_id};
+   if(c.json(actual)!==c.json(request.plan?.after))throw Error('The installed profile differs from the anticipated generation');
+   return {status:'current',profile:actual};
+  },options);
+ }
+ const p=receipt(root,true);
+ const selected=Object.entries(p.destinations).map(([rel,d])=>({rel,provider:d.provider,name:d.name}));
+ const installedOptions={...options,bridges:Object.keys(p.bridges||{})};
+ const guard=result=>{
+  requireUnaffectedProfileRuns(root);
+  return deliveryProfilePlan(root,request,result);
+ };
+ if(request.phase==='prepare'){
+  return locked(root,()=>{
+   requireUnaffectedProfileRuns(root);
+   return {status:'prepared',plan:guard(plan(root,source,p.flavor,selected,installedOptions))};
+  },options);
+ }
+ if(request.phase!=='activate'||!request.plan)throw Error('Profile maintenance requires an exact prepared generation');
+ const installed=install(root,source,p.flavor,selected,{
+  ...installedOptions,
+  guardPlan:result=>{
+   if(c.json(guard(result))!==c.json(request.plan))throw Error('Prepared profile changed before activation');
+  }
+ });
+ if(installed.action!=='installed')throw Error('The planned profile generation did not activate');
+ return {status:'installed'};
+}
 function updateDevelopmentPolicy(root,source,update) {
  const p=receipt(root,true);
  const selections=Object.entries(p.destinations).map(([rel,d])=>({rel,provider:d.provider,name:d.name}));
@@ -617,16 +1234,26 @@ function localMain(root,source,args){
  try{
   if(['lock-api','unlock-api'].includes(args[0])){console.log(c.json(require('./api-contract-locks.js').runCommand(root,source,args[0],args.slice(1))));return 0;}
   if(args.includes('--list-plugins'))return require('./plugins.js').listMain(root,args,{source});
-  if(args.some(a=>!['--refresh-profile','--regenerate-agents','--dry-run','--verify','--recover','--rollback','--rebind'].includes(a)))throw Error('Usage: manager.js --refresh-profile [--dry-run] | --regenerate-agents [--dry-run] | --verify | --recover | --rollback | --rebind | lock-api <target> [--file <path>] [--baseline <ref>] | unlock-api <target|--all>');
+  const ids=args.filter(arg=>arg.startsWith('--operation-id='));
+  if(ids.length){
+   if(ids.length!==1||!args.includes('--recover')||!setupOperationId.test(ids[0].slice('--operation-id='.length)))
+    throw Error('Select one exact --operation-id=OP-… for --recover');
+   args=args.filter(arg=>!arg.startsWith('--operation-id='));
+  }
+  if(args.some(a=>!['--refresh-profile','--regenerate-agents','--dry-run','--verify','--recover','--rollback','--rebind'].includes(a)))throw Error('Usage: manager.js --refresh-profile [--dry-run] | --regenerate-agents [--dry-run] | --verify | --recover [--operation-id=OP-…] | --rollback | --rebind | lock-api <target> [--file <path>] [--baseline <ref>] | unlock-api <target|--all>');
   const operations=args.filter(a=>a!=='--dry-run');
   if(operations.length!==1||args.filter(a=>a==='--dry-run').length>1||args.includes('--dry-run')&&!['--refresh-profile','--regenerate-agents'].includes(operations[0]))throw Error('Select exactly one manager operation; --dry-run applies only to --refresh-profile or --regenerate-agents');
   if(args.includes('--regenerate-agents')){console.log(c.json(regenerateAgents(root,source,args.includes('--dry-run'))));return 0;}
   if(args.includes('--rebind')){console.log(c.json(rebind(root,source)));return 0;}
   if(args.includes('--rollback')){console.log(c.json(rollback(root)));return 0;}
-  if(args.includes('--recover')){locked(root,()=>{});console.log('Installation recovery complete');return 0;}
+  if(args.includes('--recover')){
+   const result=locked(root,()=>({}),{setup:{kind:'recover',id:ids[0]?.slice('--operation-id='.length),
+    scope:()=>({channels:['core','plugins']}),replay:()=>({})}});
+   console.log('Installation recovery complete ('+result.operation_id+')');return 0;
+  }
   if(args.includes('--verify')){verify(root,source);console.log('Owned installation verified');return 0;}
   if(!args.includes('--refresh-profile'))throw Error('Use --refresh-profile or --verify');
-  const result=refresh(root,source,args.includes('--dry-run'));console.log(c.json({action:result.action,changed:result.delta,facts:result.profile.facts,gaps:result.profile.gaps}));return 0;
- }catch(error){console.error(error.message);return 2;}
+  const result=refresh(root,source,args.includes('--dry-run'));console.log(c.json({action:result.action,changed:result.delta,facts:result.profile.facts,gaps:result.profile.gaps,operation_id:result.operation_id}));return 0;
+ }catch(error){console.error(error.message);if(error.operation_id)console.error('Setup operation '+error.operation_id);return 2;}
 }
-module.exports={INSTALL,PROFILE,filesAt,treeHash,receipt,verifyOwned,bridgeBlock,transactionPaths,recover,transaction,locked,queueRoot,workflowState,hasActiveOperation,readHookRecords,pendingHookOperation,stoppedWorkflow,plan,install,verify,verifyTaskGroupingProfile,uninstall,refresh,rollback,rebind,localMain,updateDevelopmentPolicy};
+module.exports={INSTALL,PROFILE,filesAt,treeHash,receipt,verifyOwned,bridgeBlock,transactionPaths,recover,transaction,locked,queueRoot,workflowState,hasActiveOperation,readHookRecords,pendingHookOperation,stoppedWorkflow,plan,install,guardedInstallOperation,guardedMissingDestination,initialWorktreeProfile,verify,verifyTaskGroupingProfile,uninstall,refresh,maintainDeliveredProfile,maintainCompatibleWorktreeProfile,rollback,rebind,localMain,updateDevelopmentPolicy};

@@ -80,7 +80,7 @@ class PlanSources:
         observed = self.fixture_bytes(area, row)
         return {'manifest_sha256': sha, 'record_sha256': observed} if observed == row['sha256'] else None
 
-    def qualify(self, area, capability):
+    def qualify(self, area, capability, *, qualified_head=None):
         if capability not in {'core-task', 'narrative-canon', 'fixture-canon', 'fixture-artifact', 'fixture-consumer'}:
             return None
         try:
@@ -99,7 +99,7 @@ class PlanSources:
             if evidence is None:
                 return None
             branch = self.D.WS.local_git(root, 'symbolic-ref', '--quiet', 'HEAD', accepted=(0, 1))
-            head = self.D.WS.local_git_text(root, 'rev-parse', '--verify', 'HEAD^{commit}')
+            head = qualified_head or self.D.WS.local_git_text(root, 'rev-parse', '--verify', 'HEAD^{commit}')
         except (ValueError, OSError, subprocess.TimeoutExpired):
             return None
         qualification = {'area_id': area['id'], 'capability': capability, 'head': head,

@@ -15,6 +15,38 @@ TOKEN = re.compile(r'[a-z][a-z0-9]*(?:-[a-z0-9]+)*\Z')
 SHA = re.compile(r'[a-f0-9]{64}\Z')
 
 
+def full_cycle_partition(members, value):
+    """Validate complete, disjoint partitions in original intake order."""
+    if (not isinstance(value, dict) or set(value) != {'primary', 'deferred'}
+            or any(not isinstance(ids, list) or not ids or any(not isinstance(item, str) for item in ids)
+                   for ids in value.values())
+            or any(not isinstance(item, str) for item in members)):
+        raise ValueError('Full Cycle requires explicit nonempty primary and deferred partitions')
+    primary, deferred = value['primary'], value['deferred']
+    primary_set, deferred_set = set(primary), set(deferred)
+    if (primary_set & deferred_set or primary_set | deferred_set != set(members)
+            or primary != [item for item in members if item in primary_set]
+            or deferred != [item for item in members if item in deferred_set]
+            or len(set(members)) != len(members)):
+        raise ValueError('Full Cycle partition must cover each original member once in intake order')
+    return value
+
+
+def full_cycle_intake_partition(items, value):
+    if any(not isinstance(item, dict) or not isinstance(item.get('key'), str)
+           or not TOKEN.fullmatch(item['key']) for item in items):
+        raise ValueError('Full Cycle partition requires distinct explicit intake item keys')
+    partition = full_cycle_partition([item['key'] for item in items], value)
+    deferred = {'@' + key for key in partition['deferred']}
+    for item in items:
+        prerequisites = item.get('pending_depends_on', [])
+        if not isinstance(prerequisites, list) or any(not isinstance(key, str) for key in prerequisites):
+            raise ValueError('Full Cycle Pending prerequisites require exact P identities or batch keys')
+        if item['key'] in partition['primary'] and deferred.intersection(prerequisites):
+            raise ValueError('Primary Full Cycle work cannot require a deferred intake item')
+    return partition
+
+
 def _require(condition, message):
     if not condition:
         raise wf.WorkflowError(message)
@@ -127,15 +159,26 @@ def matches_start_workspace(store, run, receipt):
     return True
 
 
+def pending_definition_sha256(task):
+    definition = {key: value for key, value in task.items() if key not in {'start', 'end', 'line'}}
+    return _digest({**definition, 'body': task['body'].rstrip()})
+
+
 def reconcile(store, receipt):
-    if receipt['identity']['operation'] != 'start':
-        return receipt['result']
+    operation = receipt['identity']['operation']
+    result = receipt['result']
+    if operation == 'intake' and wf.valid_id(result.get('id'), 'IB'):
+        _require(wf.read_intake_receipt(store, result['id']) == result,
+                 'Original canonical intake batch receipt is unavailable or changed')
+    if operation != 'start':
+        return result
     registry = canonical_owner(store, receipt['identity']['queue_id'])
     run = registry['runs'].get(receipt['result']['id'])
     _require(run is not None and matches_start_workspace(store, run, receipt),
              'Original Director run reservation is unavailable or changed')
     wf.workspaces.inspect_directed_reservation(store, run)
-    return run
+    handoff = wf.initial_profile_handoff(store, run)
+    return {**run, 'profile_handoff': handoff} if handoff else run
 
 
 class ChildDispatch:
@@ -149,6 +192,10 @@ class ChildDispatch:
                                         'command': {name: part for name, part in self.payload.items()
                                                     if name != 'expected_source_hash'},
                                         **({'start': start_context} if start_context is not None else {})})
+        self.batch_intake_sha256 = self.payload.pop('director_batch_intake_sha256', None)
+        if self.batch_intake_sha256 is not None:
+            _require(operation == 'process' and _sha(self.batch_intake_sha256),
+                     'Batch processing requires an exact original intake receipt digest')
         _require(_sha(self.payload.get('expected_source_hash')), 'Director dispatch requires an inspected queue digest')
         if operation == 'process':
             ids = self.payload.get('selectors')
@@ -162,22 +209,74 @@ class ChildDispatch:
             _require(exact and not self.payload.get('delivery_authorization'),
                      'Directed start requires exact task scope and no automatic delivery authority')
 
+    def verify_unbound_intake(self, store):
+        text = store.text()
+        _require(wf.digest(text.encode()) == self.payload['expected_source_hash'],
+                 'Canonical child queue changed before batch processing')
+        selected = wf.resolve(wf.parse(text), self.payload['selectors'], 'Pending Queue')
+        for task in selected:
+            for batch_id in task.get('intake_batch_ids', []):
+                relative = wf.intake_receipt_path(batch_id)
+                checksum = wf.file_hash(store.owned(relative))
+                original = wf.read_intake_receipt(store, batch_id)
+                _require(original is not None and any(item['id'] == task['id'] for item in original['items']),
+                         'Original canonical intake batch receipt is unavailable or changed')
+                _require('full_cycle_partition' not in original,
+                         'Original canonical intake batch receipt requires exact Director partition authority')
+                store.expect_unchanged(relative, checksum)
+                store._future_receipts.add(relative)
+
+    def verify_batch_intake(self, store):
+        if self.identity['operation'] != 'process':
+            return
+        identity = {**self.identity, 'operation': 'intake'}
+        _, receipt = _receipt(store, identity, _digest(identity))
+        partitioned = receipt is not None and 'full_cycle_partition' in receipt['result']
+        if self.batch_intake_sha256 is None and not partitioned:
+            self.verify_unbound_intake(store)
+            return
+        _require(receipt and receipt['receipt_sha256'] == self.batch_intake_sha256
+                 and receipt['plan_sha256'] == self.plan_sha256,
+                 'Original canonical intake batch receipt is unavailable or changed')
+        result = reconcile(store, receipt)
+        defs = receipt.get('pending_definition_sha256s')
+        ids = self.payload['selectors']
+        members = [item['id'] for item in result['items']]
+        partition = result.get('full_cycle_partition')
+        expected = full_cycle_partition(members, partition)['primary'] if partitioned else members
+        _require(wf.valid_id(result.get('id'), 'IB') and ids == expected
+                 and isinstance(defs, dict) and set(defs) == set(members),
+                 'Batch process selection differs from the original canonical intake receipt')
+        text = store.text()
+        _require(wf.digest(text.encode()) == self.payload['expected_source_hash'],
+                 'Canonical child queue changed before batch processing')
+        current = {task['id']: pending_definition_sha256(task) for task in wf.parse(text)
+                   if task['id'] in defs and task['queue'] == 'Pending Queue'}
+        _require(current == defs, 'An exact staged Pending batch definition changed')
+
     def observed(self, store):
         canonical_owner(store, self.identity['queue_id'])
         _, receipt = _receipt(store, self.identity, self.key)
         if receipt is None:
+            self.verify_batch_intake(store)
             return None
         _require(receipt['semantic_sha256'] == self.semantic_sha256,
                  'Director dispatch key already belongs to a different semantic request')
         return reconcile(store, receipt)
 
-    def extras(self, store, result):
+    def extras(self, store, result, *, intake_text=None):
         relative = f'{CHILD_RECEIPTS}/{self.key}.json'
         store.expect_unchanged(relative, None)
         record = {'schema': 1, 'dispatch_key': self.key, 'identity': self.identity,
                   'plan_sha256': self.plan_sha256, 'semantic_sha256': self.semantic_sha256,
                   'source_hash_before': self.payload['expected_source_hash'], 'recorded_at': wf.now(),
                   'result': result}
+        if self.identity['operation'] == 'intake' and wf.valid_id(result.get('id'), 'IB'):
+            ids = {item['id'] for item in result['items']}
+            defined = {task['id']: pending_definition_sha256(task) for task in wf.parse(intake_text)
+                       if task['id'] in ids and task['queue'] == 'Pending Queue'}
+            _require(set(defined) == ids, 'Canonical intake batch lacks exact rendered Pending definitions')
+            record['pending_definition_sha256s'] = defined
         record['receipt_sha256'] = _digest(record)
         return {relative: wf.dump(record)}
 
