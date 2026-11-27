@@ -5032,6 +5032,11 @@
     },
     {
       "owner": "skill-tree",
+      "path": ".skill-tree/documents/early-review-pilot-report.md",
+      "role": "canonical"
+    },
+    {
+      "owner": "skill-tree",
       "path": ".skill-tree/documents/early-review-policy-study.md",
       "role": "canonical"
     },
@@ -6301,7 +6306,7 @@
     ".skill-tree/common/references/pending-task-format.md": "4c0c1ff62c07fbbd3c2e85320e5f74ef73ced158a0ff347c3cef22d1cd67cfa9",
     ".skill-tree/common/references/pending-task-intake.md": "c23e7fc58a44b58ab8e0b09ee0b15bd56fbdfd4fc275833c26fd4c8c2d0e4619",
     ".skill-tree/common/references/plugin-invocation.md": "675796e363779f1dde4571815f302c6db1956ab7473b382862e63b7f8c123caf",
-    ".skill-tree/common/references/pr-review-cycle.md": "dec7a0339d4b0497c488ba48e54a4b22c715190ff7da77bde96444af84405120",
+    ".skill-tree/common/references/pr-review-cycle.md": "23a0be30b11094e0a792cab7944ff75fb9def2b6b98a5483e27943e3c96acb4f",
     ".skill-tree/common/references/repository-discovery-checklist.md": "a112230c076fea515c437e3e7407c575ee6690d772eaa28e68f80c720c7a621c",
     ".skill-tree/common/references/run-workspaces.md": "170251170232d01dee1cadbe9cb59f554d49c4e4cbcd490a6bc5d5a62f698292",
     ".skill-tree/common/references/snapshot-rules.md": "18142120546fcd532e496fbd14aefbe449fa63da40cbcca577db249b91dcd30e",
@@ -6348,7 +6353,7 @@
     ".skill-tree/common/scripts/plugin-invocation.py": "aca65cd589ec6bb989be0a9d2227daec115349d45b4a06f98731b11d416d7c29",
     ".skill-tree/common/scripts/plugin-manager.js": "7cf2b375d959be40b7bfbff038ae69d87440817b7af5c1d7a44f9ba95aefb337",
     ".skill-tree/common/scripts/plugin-processing.py": "71e6ee8f1c9b7015d031872bd6fc63a3875e41807bf81eb4133f2c69fe7f3ee4",
-    ".skill-tree/common/scripts/pr-review-state.py": "1bdf5e665595d42838f03607355eb860ed75fe49c09037e60a4ddda020797d39",
+    ".skill-tree/common/scripts/pr-review-state.py": "f25670cc5d0941b0bc5e1f234b2446b166c8326bb6145ddd279aa4484de24880",
     ".skill-tree/common/scripts/run-workspaces.py": "3e69242f598a35c31ad5d9bcf6ac8e3cb6a2ebe89857a961e0a01b92d2c477f2",
     ".skill-tree/common/scripts/select-prioritized-task.py": "93f12ac5a333fb072bf8d9d849d08e3b422af856d582d492902647efe35c896f",
     ".skill-tree/common/scripts/setup-operation-receipts.py": "82225c0da2a672774fb1cd8e1ecba4f91afbdcbf61a2157fa10385a27d73032e",
@@ -6371,6 +6376,7 @@
     ".skill-tree/documents/build-and-release.md": "48c11b6608256cb65f5f07ae20955808539c675441eb9fc69c9713fec725863a",
     ".skill-tree/documents/dependencies.md": "e524d1d314d8c443e000260860e71fca6db4bd6938e86cb7443379a6fb2db4f3",
     ".skill-tree/documents/director-workflow.md": "25c8ad6dacce8ad03f4708d16e364b0f80a2ad4c53220471ffde196dd69cb09d",
+    ".skill-tree/documents/early-review-pilot-report.md": "5b97f04b32fd4376894716a6e0fbbac79762a074a86e92e3e8befa2b98db7197",
     ".skill-tree/documents/early-review-policy-study.md": "02484cd40cdd1463cb5a415f1bbcff0cee7536c62e9e40c559e472856fe900b8",
     ".skill-tree/documents/features.md": "0468d553ed51ac41d22f130b13f0085d332050db2874036ae2f417bf0333bb4d",
     ".skill-tree/documents/future.md": "05a1f55b7a7202ce1a56bb01919c016110a355ca8de0fe746183d6e62853e634",
